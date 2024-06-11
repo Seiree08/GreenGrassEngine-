@@ -247,6 +247,8 @@ HRESULT InitDevice()
     hr = g_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
     if( FAILED( hr ) )
         return hr;
+    
+    //Create a render target view
     g_device.CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
     //hr = g_device.m_device->CreateRenderTargetView( pBackBuffer, NULL, &g_pRenderTargetView );
     pBackBuffer->Release();
@@ -480,6 +482,8 @@ HRESULT InitDevice()
         return hr;
 
     // Load the Texture
+    //Cómo lo dice, crea una textura a partir de una imagen cargada
+    //Aqui verifica si el valor de retorno es correcto
     hr = D3DX11CreateShaderResourceViewFromFile( g_device.m_device, "seafloor.dds", NULL, NULL, &g_pTextureRV, NULL );
     if( FAILED( hr ) )
         return hr;

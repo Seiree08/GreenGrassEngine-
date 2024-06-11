@@ -41,6 +41,9 @@
     <ClInclude Include="Include\SwapChain.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Texture.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GreenGrassEngine.cpp" />
@@ -54,6 +57,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\DeviceContext.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SwapChain.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Texture.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
