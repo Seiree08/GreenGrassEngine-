@@ -8,6 +8,7 @@
 #include "PreRequisites.h"
 #include "Window.h"
 #include "Device.h"
+#include "DeviceContext.h"
 
 //--------------------------------------------------------------------------------------
 // Structures
@@ -42,11 +43,11 @@ struct CBChangesEveryFrame
 //HWND                                g_hWnd = NULL;
 Window                              g_window;
 Device                              g_device;
-
+DeviceContext                       g_deviceContext;
 D3D_DRIVER_TYPE                     g_driverType = D3D_DRIVER_TYPE_NULL;
 D3D_FEATURE_LEVEL                   g_featureLevel = D3D_FEATURE_LEVEL_11_0;
 //ID3D11Device*                       g_device.m_device = NULL;
-ID3D11DeviceContext*                g_pImmediateContext = NULL;
+//ID3D11DeviceContext*                g_deviceContext.m_deviceContext = NULL;
 IDXGISwapChain*                     g_pSwapChain = NULL;
 ID3D11RenderTargetView*             g_pRenderTargetView = NULL;
 ID3D11Texture2D*                    g_pDepthStencil = NULL;
@@ -234,7 +235,7 @@ HRESULT InitDevice()
     {
         g_driverType = driverTypes[driverTypeIndex];
         hr = D3D11CreateDeviceAndSwapChain( NULL, g_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-                                            D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_device.m_device, &g_featureLevel, &g_pImmediateContext );
+                                            D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_device.m_device, &g_featureLevel, &g_deviceContext.m_deviceContext );
         if( SUCCEEDED( hr ) )
             break;
     }
@@ -283,7 +284,7 @@ HRESULT InitDevice()
     //if( FAILED( hr ) )
      //   return hr;
 
-    g_pImmediateContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
+    g_deviceContext.m_deviceContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
 
     // Setup the viewport
     D3D11_VIEWPORT vp;
@@ -293,7 +294,7 @@ HRESULT InitDevice()
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0;
     vp.TopLeftY = 0;
-    g_pImmediateContext->RSSetViewports( 1, &vp );
+    g_deviceContext.m_deviceContext->RSSetViewports( 1, &vp );
 
     // Compile the vertex shader
     ID3DBlob* pVSBlob = NULL;
@@ -323,14 +324,18 @@ HRESULT InitDevice()
     UINT numElements = ARRAYSIZE( layout );
 
     // Create the input layout
-    hr = g_device.m_device->CreateInputLayout( layout, numElements, pVSBlob->GetBufferPointer(),
-                                          pVSBlob->GetBufferSize(), &g_pVertexLayout );
+    // AQUÍ SE GESTIONA LA PARTE DE INFORMACIÓN DEL SHADER
+    //hr = g_device.m_device->CreateInputLayout( layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout );
+    //layout: es la estructura de datos a mandar a revisar del shader
+    //numElements: es el tamaño del arreglo
+    //pVSBlob: es la referecncia al VertexShader
+    hr = g_device.CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout);
     pVSBlob->Release();
     if( FAILED( hr ) )
         return hr;
 
     // Set the input layout
-    g_pImmediateContext->IASetInputLayout( g_pVertexLayout );
+    g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
 
     // Compile the pixel shader
     ID3DBlob* pPSBlob = NULL;
@@ -343,12 +348,15 @@ HRESULT InitDevice()
     }
 
     // Create the pixel shader
-    hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
+    //La diferencia de este a vertex shader es el puntero
+    //hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
+    hr = g_device.CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader);
     pPSBlob->Release();
     if( FAILED( hr ) )
         return hr;
 
     // Create vertex buffer
+    //Los buffers sirven para contener info
     SimpleVertex vertices[] =
     {
         { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
@@ -391,14 +399,17 @@ HRESULT InitDevice()
     D3D11_SUBRESOURCE_DATA InitData;
     ZeroMemory( &InitData, sizeof(InitData) );
     InitData.pSysMem = vertices;
-    hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pVertexBuffer );
+    //hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pVertexBuffer );
+    //este bufer tiene InitialData
+    //este es el buffer del VertexShader
+    hr = g_device.CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
     if( FAILED( hr ) )
         return hr;
 
     // Set vertex buffer
     UINT stride = sizeof( SimpleVertex );
     UINT offset = 0;
-    g_pImmediateContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
+    g_deviceContext.m_deviceContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
 
     // Create index buffer
     // Create vertex buffer
@@ -428,32 +439,43 @@ HRESULT InitDevice()
     bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
     bd.CPUAccessFlags = 0;
     InitData.pSysMem = indices;
-    hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pIndexBuffer );
+    //hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pIndexBuffer );
+    //este bufer tiene InitialData
+    //este es el buffer del IndexShader
+    hr = g_device.CreateBuffer(&bd, &InitData, &g_pIndexBuffer);
+
     if( FAILED( hr ) )
         return hr;
 
     // Set index buffer
-    g_pImmediateContext->IASetIndexBuffer( g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
+    g_deviceContext.m_deviceContext->IASetIndexBuffer( g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
 
     // Cambia la forma en que se construye la figura, creo...                                                                               ***
-    g_pImmediateContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
     // Create the constant buffers
     bd.Usage = D3D11_USAGE_DEFAULT;
     bd.ByteWidth = sizeof(CBNeverChanges);
+    //ConstantBuffer no tiene InitalData
+    //Los buffers de CONSTANT son los 3 de abajo 
     bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     bd.CPUAccessFlags = 0;
-    hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBNeverChanges );
+    //hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBNeverChanges );
+    hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBNeverChanges);
+
     if( FAILED( hr ) )
         return hr;
     
     bd.ByteWidth = sizeof(CBChangeOnResize);
-    hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBChangeOnResize );
+    //hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBChangeOnResize );
+    hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBChangeOnResize);
+
     if( FAILED( hr ) )
         return hr;
     
     bd.ByteWidth = sizeof(CBChangesEveryFrame);
-    hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBChangesEveryFrame );
+    //hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBChangesEveryFrame );
+    hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBChangesEveryFrame);
     if( FAILED( hr ) )
         return hr;
 
@@ -472,7 +494,9 @@ HRESULT InitDevice()
     sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    hr = g_device.m_device->CreateSamplerState( &sampDesc, &g_pSamplerLinear );
+    //Es una vinculación entre los recursos que se usan en texturas y cómo quiero que se usen
+    //hr = g_device.m_device->CreateSamplerState( &sampDesc, &g_pSamplerLinear );
+    hr = g_device.CreateSamplerState(&sampDesc, &g_pSamplerLinear);
     if( FAILED( hr ) )
         return hr;
 
@@ -487,14 +511,14 @@ HRESULT InitDevice()
 
     CBNeverChanges cbNeverChanges;
     cbNeverChanges.mView = XMMatrixTranspose( g_View );
-    g_pImmediateContext->UpdateSubresource( g_pCBNeverChanges, 0, NULL, &cbNeverChanges, 0, 0 );
+    g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBNeverChanges, 0, NULL, &cbNeverChanges, 0, 0 );
 
     // Initialize the projection matrix
     g_Projection = XMMatrixPerspectiveFovLH( XM_PIDIV4, g_window.m_width / (FLOAT)g_window.m_height, 0.01f, 100.0f );
     
     CBChangeOnResize cbChangesOnResize;
     cbChangesOnResize.mProjection = XMMatrixTranspose( g_Projection );
-    g_pImmediateContext->UpdateSubresource( g_pCBChangeOnResize, 0, NULL, &cbChangesOnResize, 0, 0 );
+    g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBChangeOnResize, 0, NULL, &cbChangesOnResize, 0, 0 );
 
     return S_OK;
 }
@@ -505,7 +529,7 @@ HRESULT InitDevice()
 //--------------------------------------------------------------------------------------
 void CleanupDevice()
 {
-    if( g_pImmediateContext ) g_pImmediateContext->ClearState();
+    if( g_deviceContext.m_deviceContext ) g_deviceContext.m_deviceContext->ClearState();
 
     if( g_pSamplerLinear ) g_pSamplerLinear->Release();
     if( g_pTextureRV ) g_pTextureRV->Release();
@@ -521,7 +545,9 @@ void CleanupDevice()
     if( g_pDepthStencilView ) g_pDepthStencilView->Release();
     if( g_pRenderTargetView ) g_pRenderTargetView->Release();
     if( g_pSwapChain ) g_pSwapChain->Release();
-    if( g_pImmediateContext ) g_pImmediateContext->Release();
+    //if( g_deviceContext.m_deviceContext ) g_deviceContext.m_deviceContext->Release();
+    //Cambiamos esto por nuestra función que libera m_deviceContext
+    g_deviceContext.destroy();
     g_device.destroy();
     //if( g_device.m_device ) g_device.m_device->Release();
 }
@@ -586,12 +612,12 @@ void Render()
     // Clear the back buffer
     //
     float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
-    g_pImmediateContext->ClearRenderTargetView( g_pRenderTargetView, ClearColor );
+    g_deviceContext.m_deviceContext->ClearRenderTargetView( g_pRenderTargetView, ClearColor );
 
     //
     // Clear the depth buffer to 1.0 (max depth)
     //
-    g_pImmediateContext->ClearDepthStencilView( g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0 );
+    g_deviceContext.m_deviceContext->ClearDepthStencilView( g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0 );
 
     //
     // Update variables that change once per frame
@@ -599,20 +625,20 @@ void Render()
     CBChangesEveryFrame cb;
     cb.mWorld = XMMatrixTranspose( g_World );
     cb.vMeshColor = g_vMeshColor;
-    g_pImmediateContext->UpdateSubresource( g_pCBChangesEveryFrame, 0, NULL, &cb, 0, 0 );
+    g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBChangesEveryFrame, 0, NULL, &cb, 0, 0 );
 
     //
     // Render the cube
     //
-    g_pImmediateContext->VSSetShader( g_pVertexShader, NULL, 0 );
-    g_pImmediateContext->VSSetConstantBuffers( 0, 1, &g_pCBNeverChanges );
-    g_pImmediateContext->VSSetConstantBuffers( 1, 1, &g_pCBChangeOnResize );
-    g_pImmediateContext->VSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
-    g_pImmediateContext->PSSetShader( g_pPixelShader, NULL, 0 );
-    g_pImmediateContext->PSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
-    g_pImmediateContext->PSSetShaderResources( 0, 1, &g_pTextureRV );
-    g_pImmediateContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );
-    g_pImmediateContext->DrawIndexed( 36, 0, 0 );
+    g_deviceContext.m_deviceContext->VSSetShader( g_pVertexShader, NULL, 0 );
+    g_deviceContext.m_deviceContext->VSSetConstantBuffers( 0, 1, &g_pCBNeverChanges );
+    g_deviceContext.m_deviceContext->VSSetConstantBuffers( 1, 1, &g_pCBChangeOnResize );
+    g_deviceContext.m_deviceContext->VSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
+    g_deviceContext.m_deviceContext->PSSetShader( g_pPixelShader, NULL, 0 );
+    g_deviceContext.m_deviceContext->PSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
+    g_deviceContext.m_deviceContext->PSSetShaderResources( 0, 1, &g_pTextureRV );
+    g_deviceContext.m_deviceContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );
+    g_deviceContext.m_deviceContext->DrawIndexed( 36, 0, 0 );
 
     //
     // Present our back buffer to our front buffer

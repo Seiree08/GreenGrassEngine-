@@ -427,6 +427,7 @@
     <ClCompile Include="Include\Window.cpp" />
     <ClCompile Include="Source\BaseApp.cpp" />
     <ClCompile Include="Source\Device.cpp" />
+    <ClCompile Include="Source\DeviceContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GreenGrassEngine.fx">
@@ -441,8 +442,10 @@
   <ItemGroup>
     <ClInclude Include="Include\BaseApp.h" />
     <ClInclude Include="Include\Device.h" />
+    <ClInclude Include="Include\DeviceContext.h" />
     <ClInclude Include="Include\PreRequisites.h" />
     <ClInclude Include="Include\Resource.h" />
+    <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\Window.h" />
     <CLInclude Include="resource.h" />
     <ResourceCompile Include="GreenGrassEngine.rc" />
