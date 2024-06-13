@@ -1,3 +1,4 @@
+//Aquí se ve si los recursos están bien cargados
 #include "Device.h"
      
 void Device::init()
@@ -14,9 +15,11 @@ void Device::render()
 
 void Device::destroy()
 {
+    //Aquí se incluye en SAFE_RELEASE  
     SAFE_RELEASE(m_device);
 }
 
+//Se implementa la función 
 HRESULT Device::CreateRenderTargetView(ID3D11Resource* pResource, 
     const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, 
     ID3D11RenderTargetView** ppRTView)
@@ -36,17 +39,18 @@ HRESULT Device::CreateRenderTargetView(ID3D11Resource* pResource,
     return hr;
 }
 
+//Se implementa la función
 HRESULT Device::CreateTexture2D(const D3D11_TEXTURE2D_DESC* pDesc, 
     const D3D11_SUBRESOURCE_DATA* pInitialData, 
     ID3D11Texture2D** ppTexture2D)
 {
     {
         HRESULT hr = S_OK;
-        //Check if the resource and RTView exist
+        //Check if the resource and CT2D exist
         if (pDesc != nullptr || ppTexture2D != nullptr)
         {
             hr = m_device->CreateTexture2D(pDesc, pInitialData, ppTexture2D);
-            MESSAGE("Device", "CreateRenderTarfetView", "OK")
+            MESSAGE("Device", "CreateTexture2D", "OK")
         }
         else
         {
@@ -62,7 +66,8 @@ HRESULT Device::CreateDepthStencilView(ID3D11Resource* pResource,
     ID3D11DepthStencilView** ppDepthStencilView)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CDSView exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pResource == nullptr)
     {
         ERROR("Device", "CreateDepthStencilView", "CHECK FOR CreateDepthStencilView METHOD")
@@ -76,7 +81,7 @@ HRESULT Device::CreateDepthStencilView(ID3D11Resource* pResource,
     else
     {
         hr = m_device->CreateDepthStencilView(pResource, pDesc, ppDepthStencilView);
-        MESSAGE("Device", "CreateRenderTarfetView", "OK")
+        MESSAGE("Device", "CreateDepthStencilView", "OK")
     }
     return hr;
 }
@@ -87,7 +92,8 @@ HRESULT Device::CreateVertexShader(const void* pShaderBytecode,
     ID3D11VertexShader** ppVertexShader)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CVShader exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pShaderBytecode == nullptr)
     {
         ERROR("Device", "CreateVertexShader", "CHECK FOR const void* pShaderBytecode")
@@ -113,7 +119,8 @@ HRESULT Device::CreateInputLayout(D3D11_INPUT_ELEMENT_DESC* pInputElementDescs,
     ID3D11InputLayout** ppInputLayout)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CILayout exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pInputElementDescs == nullptr)
     {
         ERROR("Device", "CreateInputLayout", "CHECK FOR const D3D11_INPUT_ELEMENT_DESC* pInputElementDescs")
@@ -147,7 +154,8 @@ HRESULT Device::CreatePixelShader(const void* pShaderBytecode,
     ID3D11PixelShader** ppPixelShader)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CPShader exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pShaderBytecode == nullptr)
     {
         ERROR("Device", "CreatePixelShader", "CHECK FOR const void* pShaderBytecode")
@@ -171,7 +179,8 @@ HRESULT Device::CreateBuffer(const D3D11_BUFFER_DESC* pDesc/*Revisamos que el bu
     ID3D11Buffer** ppBuffer)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CB exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pDesc == nullptr)
     {
         ERROR("Device", "CreateBuffer", "CHECK FOR const D3D11_BUFFER_DESC* pDesc")
@@ -193,7 +202,8 @@ HRESULT Device::CreateBuffer(const D3D11_BUFFER_DESC* pDesc/*Revisamos que el bu
 HRESULT Device::CreateSamplerState(const D3D11_SAMPLER_DESC* pSamplerDesc, ID3D11SamplerState** ppSamplerState)
 {
     HRESULT hr = S_OK;
-    //Check if the resource and RTView exist
+    //Check if the resource and CSState exist
+    //Se deben comprobar dos cosas distintas por ello se crean dos mensajes distintos
     if (pSamplerDesc == nullptr)
     {
         ERROR("Device", "CreateSamplerState", "CHECK FOR const D3D11_SAMPLER_DESC* pSamplerDesc")

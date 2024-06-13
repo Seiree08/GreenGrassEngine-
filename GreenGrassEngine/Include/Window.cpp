@@ -3,11 +3,12 @@
 HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
 {
     m_hInst = hInstance;
+    //Hace referecia al parámetro de la función "HINSTANCE hInstance"
     // Register class
     WNDCLASSEX wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = wndproc;
+    wcex.lpfnWndProc = wndproc; /*Este wndproc es nuestro parámetro*/
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = m_hInst;
@@ -21,11 +22,19 @@ HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
         return E_FAIL;
 
     // Create window
-    RECT rc = { 0, 0, 1500, 840 };
-    m_rect = rc;
+    RECT rc = { 0, 0, 640, 480};/*Ajusta el tamaño de la ventana*/
+    m_rect = rc; /*Pa' usar m_rect en lugar de rc*/
     AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-    m_hWnd = CreateWindow("TutorialWindowClass", m_windowName.c_str(), WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, m_rect.right - m_rect.left, m_rect.bottom - m_rect.top, nullptr, nullptr, hInstance,
+    m_hWnd = CreateWindow("TutorialWindowClass", 
+        m_windowName.c_str(), 
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 
+        CW_USEDEFAULT, 
+        m_rect.right - m_rect.left, 
+        m_rect.bottom - m_rect.top, 
+        nullptr, 
+        nullptr, 
+        hInstance,
         nullptr);
     if (!m_hWnd)
         return E_FAIL;
@@ -35,6 +44,7 @@ HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
     GetClientRect(m_hWnd, &m_rect);
     m_width = m_rect.right - m_rect.left;
     m_height = m_rect.bottom - m_rect.top;
+    //Se taren las variebles de initDevice y se ajustan
     return S_OK;
 }
 

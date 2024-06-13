@@ -1,3 +1,5 @@
+//Aquí se manejan las librerías a utilizar, no es una clase
+
 #pragma once
 //Librerías STD
 #include <string>
@@ -13,7 +15,9 @@
 
 //Third Parties
 
-// MACRO for safe release of resources
+/*Se usan macros pa' agilizar el proyecto*/
+
+// MACRO for safe release of resources, libera memoria de forma segura
 #define SAFE_RELEASE(x) if(x != nullptr) x->Release(); x = nullptr;
 
 // * To check monster
@@ -25,6 +29,7 @@
 //OutputDebugStringA(_OutputMessage);                                    \
 //OutputDebugStringA("\n");
 
+//Muestra los mensaje en consola pa' saber qué pasa en el proyecto
 #define WARNING( s )                         \
 {                                            \
    std::wostringstream os_;                  \
@@ -32,6 +37,7 @@
    OutputDebugStringW( os_.str().c_str() );  \
 }
 
+//Es para mostrar mensaje de manera ordenada
 #define MESSAGE( classObj, method, state )   \
 {                                            \
    std::wostringstream os_;                  \
@@ -39,6 +45,7 @@
    OutputDebugStringW( os_.str().c_str() );  \
 }
 
+//Es para mostrar errores de manera ordenada
 #define ERROR( classObj, method, errorMSG )   \
 {                                            \
    std::wostringstream os_;                  \

@@ -1,5 +1,7 @@
 #include "BaseApp.h"
 
+//Se decaran los métodos init, update, render, destroy y run
+
 HRESULT BaseApp::init()
 {
     return E_NOTIMPL;
@@ -55,6 +57,7 @@ BaseApp::run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int
     return (int)msg.wParam;
 }
 
+//Se pone el contenido que està en el engine.cpp
 LRESULT BaseApp::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;

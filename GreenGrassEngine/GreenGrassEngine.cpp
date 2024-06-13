@@ -10,6 +10,7 @@
 #include "Device.h"
 #include "DeviceContext.h"
 
+ 
 //--------------------------------------------------------------------------------------
 // Structures
 //--------------------------------------------------------------------------------------
@@ -41,8 +42,10 @@ struct CBChangesEveryFrame
 //--------------------------------------------------------------------------------------
 //HINSTANCE                           g_hInst = NULL;
 //HWND                                g_hWnd = NULL;
+//Estas variables se comentan y se declaran las nuestras debajo
 Window                              g_window;
 Device                              g_device;
+//Son nuestras variables personalizadas
 DeviceContext                       g_deviceContext;
 D3D_DRIVER_TYPE                     g_driverType = D3D_DRIVER_TYPE_NULL;
 D3D_FEATURE_LEVEL                   g_featureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -77,18 +80,19 @@ void CleanupDevice();
 LRESULT CALLBACK    WndProc( HWND, UINT, WPARAM, LPARAM );
 void Render();
 
-
 //--------------------------------------------------------------------------------------
 // Entry point to the program. Initializes everything and goes into a message processing 
 // loop. Idle time is used to render the scene.
 //--------------------------------------------------------------------------------------
+
+//Los parámetros de aquí se vinculan con la inicialización del programa
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
 {
     //baseapp.run();
     UNREFERENCED_PARAMETER( hPrevInstance );
     UNREFERENCED_PARAMETER( lpCmdLine );
 
-    if( FAILED(g_window.init( hInstance, nCmdShow, WndProc) ) )
+    if( FAILED(g_window.init( hInstance, nCmdShow, WndProc) ) ) /*Se sustituye por nuestro objeto pa' acceder al init y se agreda en WndProc*/
         return 0;
 
     if( FAILED( InitDevice() ) )
@@ -117,6 +121,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     return ( int )msg.wParam;
 }
 
+/*Se comenta esta función*/
 
 //--------------------------------------------------------------------------------------
 // Register class and create window
@@ -217,16 +222,17 @@ HRESULT InitDevice()
     };
     UINT numFeatureLevels = ARRAYSIZE( featureLevels );
 
+    //Se ajustan las variables por las nuetras 
     DXGI_SWAP_CHAIN_DESC sd;
     ZeroMemory( &sd, sizeof( sd ) );
     sd.BufferCount = 1;
-    sd.BufferDesc.Width = g_window.m_width;
-    sd.BufferDesc.Height = g_window.m_height;
+    sd.BufferDesc.Width = g_window.m_width; /* */
+    sd.BufferDesc.Height = g_window.m_height; /* */
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     sd.BufferDesc.RefreshRate.Numerator = 60;
     sd.BufferDesc.RefreshRate.Denominator = 1;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = g_window.m_hWnd;
+    sd.OutputWindow = g_window.m_hWnd; /* */
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;
@@ -248,7 +254,7 @@ HRESULT InitDevice()
     if( FAILED( hr ) )
         return hr;
     
-    //Create a render target view
+    //Create a render target view a partir de nuestras variables 
     g_device.CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
     //hr = g_device.m_device->CreateRenderTargetView( pBackBuffer, NULL, &g_pRenderTargetView );
     pBackBuffer->Release();
@@ -256,10 +262,11 @@ HRESULT InitDevice()
     //    return hr;
 
     // Create depth stencil texture
+    //Se ajustan las variables por las nuetras 
     D3D11_TEXTURE2D_DESC descDepth;
     ZeroMemory( &descDepth, sizeof(descDepth) );
-    descDepth.Width = g_window.m_width;
-    descDepth.Height = g_window.m_height;
+    descDepth.Width = g_window.m_width; /* */
+    descDepth.Height = g_window.m_height; /* */
     descDepth.MipLevels = 1;
     descDepth.ArraySize = 1;
     descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -270,6 +277,7 @@ HRESULT InitDevice()
     descDepth.CPUAccessFlags = 0;
     descDepth.MiscFlags = 0;
     g_device.CreateTexture2D(&descDepth, nullptr, &g_pDepthStencil);
+    //Se cambia la forma de crear la textura con nuestras variables
     //hr = g_device.m_device->CreateTexture2D( &descDepth, NULL, &g_pDepthStencil );
     //if( FAILED( hr ) )
     //    return hr;
@@ -282,6 +290,7 @@ HRESULT InitDevice()
     descDSV.Texture2D.MipSlice = 0;
 
     g_device.CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
+    //Se cambia por nuestras variables
     //hr = g_device.m_device->CreateDepthStencilView( g_pDepthStencil, &descDSV, &g_pDepthStencilView );
     //if( FAILED( hr ) )
      //   return hr;
@@ -289,9 +298,10 @@ HRESULT InitDevice()
     g_deviceContext.m_deviceContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
 
     // Setup the viewport
+    //Se ajustan las variables por las nuetras 
     D3D11_VIEWPORT vp;
-    vp.Width = (FLOAT)g_window.m_width;
-    vp.Height = (FLOAT)g_window.m_height;
+    vp.Width = (FLOAT)g_window.m_width; /* */
+    vp.Height = (FLOAT)g_window.m_height; /* */
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0;
@@ -310,7 +320,9 @@ HRESULT InitDevice()
 
     // Create the vertex shader
     // hr = g_device.m_device->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), NULL, &g_pVertexShader );
+    //Se sustituye el mpetodo por nuestras variables
     hr = g_device.CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
+    //No se le hace release al FAILED, ¿quizá por malas prácticas?...
     if( FAILED( hr ) )
     {    
         pVSBlob->Release();
@@ -352,12 +364,16 @@ HRESULT InitDevice()
     // Create the pixel shader
     //La diferencia de este a vertex shader es el puntero
     //hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
-    hr = g_device.CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader);
+    hr = g_device.CreatePixelShader(pPSBlob->GetBufferPointer(), 
+                                    pPSBlob->GetBufferSize(), 
+                                    nullptr, 
+                                    &g_pPixelShader);
     pPSBlob->Release();
     if( FAILED( hr ) )
         return hr;
 
     // Create vertex buffer
+    //Almacena la informaciòn de los vèrtices de las caras del cubo
     //Los buffers sirven para contener info
     SimpleVertex vertices[] =
     {
@@ -415,11 +431,15 @@ HRESULT InitDevice()
 
     // Create index buffer
     // Create vertex buffer
+    //Es la referencia de sonde se encuentran los recursos, con qué se conecta cada vèrtice 
     WORD indices[] =
     {
+    //Empieza por una cara
+        //El 3 dice que empieza por ahí y que se conceta con otros a partir del 3
         3,1,0,
+        //Aquí hace la conexión 
         2,1,3,
-
+    //Esta es otra cara y así
         6,4,5,
         7,4,6,
 
@@ -436,6 +456,7 @@ HRESULT InitDevice()
         23,20,22
     };
 
+    //Esta info se procesa en un buffer
     bd.Usage = D3D11_USAGE_DEFAULT;
     bd.ByteWidth = sizeof( WORD ) * 36;
     bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -452,7 +473,8 @@ HRESULT InitDevice()
     // Set index buffer
     g_deviceContext.m_deviceContext->IASetIndexBuffer( g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
 
-    // Cambia la forma en que se construye la figura, creo...                                                                               ***
+    //Set primitive topology
+    // Cambia la forma en que se construye la figura según los vértices
     g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
     // Create the constant buffers
@@ -518,7 +540,8 @@ HRESULT InitDevice()
     g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBNeverChanges, 0, NULL, &cbNeverChanges, 0, 0 );
 
     // Initialize the projection matrix
-    g_Projection = XMMatrixPerspectiveFovLH( XM_PIDIV4, g_window.m_width / (FLOAT)g_window.m_height, 0.01f, 100.0f );
+    //Se ajustan las variables por las nuetras 
+    g_Projection = XMMatrixPerspectiveFovLH( XM_PIDIV4, g_window.m_width /* */ / (FLOAT)g_window.m_height /* */, 0.01f, 100.0f);
     
     CBChangeOnResize cbChangesOnResize;
     cbChangesOnResize.mProjection = XMMatrixTranspose( g_Projection );
@@ -552,6 +575,7 @@ void CleanupDevice()
     //if( g_deviceContext.m_deviceContext ) g_deviceContext.m_deviceContext->Release();
     //Cambiamos esto por nuestra función que libera m_deviceContext
     g_deviceContext.destroy();
+    //Libera la información con nuestro método personalizado
     g_device.destroy();
     //if( g_device.m_device ) g_device.m_device->Release();
 }
