@@ -14,6 +14,13 @@ public:
 	SwapChain() = default;
 	~SwapChain() = default;
 
+	/// <summary>
+	///  inicializa la “SwapChain” y otros recursos relacionados con Direct3D.
+	/// </summary>
+	/// <param name="device">Este es un objeto de dispositivo, que se utiliza para crear recursos de Direct3D.</param>
+	/// <param name="deviceContext">Este es un objeto de contexto de dispositivo, que se utiliza para configurar y controlar cómo los gráficos se dibujan.</param>
+	/// <param name="backBuffer">Este es un objeto de textura que representa el back buffer. En una “SwapChain”, el back buffer es donde se dibujan los gráficos antes de que se muestren en la pantalla.</param>
+	/// <param name="window">Este es un objeto de ventana que representa la ventana en la que se mostrarán los gráficos.</param>
 	void init(Device & device,
 		DeviceContext & deviceContext,
 		Texture & backBuffer,

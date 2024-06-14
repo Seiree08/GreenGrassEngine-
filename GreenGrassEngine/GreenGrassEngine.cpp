@@ -9,7 +9,9 @@
 #include "Window.h"
 #include "Device.h"
 #include "DeviceContext.h"
-
+#include "Texture.h"
+#include "SwapChain.h"
+#include "DepthStencilView.h"
  
 //--------------------------------------------------------------------------------------
 // Structures
@@ -40,21 +42,26 @@ struct CBChangesEveryFrame
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
+//Estas variables se comentan y se declaran las nuestras debajo
 //HINSTANCE                           g_hInst = NULL;
 //HWND                                g_hWnd = NULL;
-//Estas variables se comentan y se declaran las nuestras debajo
-Window                              g_window;
-Device                              g_device;
-//Son nuestras variables personalizadas
-DeviceContext                       g_deviceContext;
-D3D_DRIVER_TYPE                     g_driverType = D3D_DRIVER_TYPE_NULL;
-D3D_FEATURE_LEVEL                   g_featureLevel = D3D_FEATURE_LEVEL_11_0;
+//D3D_DRIVER_TYPE                     g_driverType = D3D_DRIVER_TYPE_NULL;
+//D3D_FEATURE_LEVEL                   g_featureLevel = D3D_FEATURE_LEVEL_11_0;
 //ID3D11Device*                       g_device.m_device = NULL;
 //ID3D11DeviceContext*                g_deviceContext.m_deviceContext = NULL;
-IDXGISwapChain*                     g_pSwapChain = NULL;
+//IDXGISwapChain*                     g_pSwapChain = NULL;
+//ID3D11Texture2D*                    g_pDepthStencil = NULL;
+//ID3D11DepthStencilView*             g_pDepthStencilView = NULL;   
+//Son nuestras variables personalizadas
+Window                              g_window;
+Device                              g_device;
+DeviceContext                       g_deviceContext;
+SwapChain                           g_swapchain;
+Texture                             g_backBuffer;
+Texture                             g_depthStencil;
+DepthStencilView                    g_depthStencilView;
+/*---------------------------------------------------------------------------------------*/
 ID3D11RenderTargetView*             g_pRenderTargetView = NULL;
-ID3D11Texture2D*                    g_pDepthStencil = NULL;
-ID3D11DepthStencilView*             g_pDepthStencilView = NULL;
 ID3D11VertexShader*                 g_pVertexShader = NULL;
 ID3D11PixelShader*                  g_pPixelShader = NULL;
 ID3D11InputLayout*                  g_pVertexLayout = NULL;
@@ -198,104 +205,116 @@ HRESULT CompileShaderFromFile(char* szFileName, LPCSTR szEntryPoint, LPCSTR szSh
 HRESULT InitDevice()
 {
     HRESULT hr = S_OK;
-
-    WARNING("Device::CreateRenderTargetView : [")
-
-    UINT createDeviceFlags = 0;
-#ifdef _DEBUG
-    createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-    D3D_DRIVER_TYPE driverTypes[] =
-    {
-        D3D_DRIVER_TYPE_HARDWARE,
-        D3D_DRIVER_TYPE_WARP,
-        D3D_DRIVER_TYPE_REFERENCE,
-    };
-    UINT numDriverTypes = ARRAYSIZE( driverTypes );
-
-    D3D_FEATURE_LEVEL featureLevels[] =
-    {
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-    };
-    UINT numFeatureLevels = ARRAYSIZE( featureLevels );
-
-    //Se ajustan las variables por las nuetras 
-    DXGI_SWAP_CHAIN_DESC sd;
-    ZeroMemory( &sd, sizeof( sd ) );
-    sd.BufferCount = 1;
-    sd.BufferDesc.Width = g_window.m_width; /* */
-    sd.BufferDesc.Height = g_window.m_height; /* */
-    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    sd.BufferDesc.RefreshRate.Numerator = 60;
-    sd.BufferDesc.RefreshRate.Denominator = 1;
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = g_window.m_hWnd; /* */
-    sd.SampleDesc.Count = 1;
-    sd.SampleDesc.Quality = 0;
-    sd.Windowed = TRUE;
-
-    for( UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++ )
-    {
-        g_driverType = driverTypes[driverTypeIndex];
-        hr = D3D11CreateDeviceAndSwapChain( NULL, g_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-                                            D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_device.m_device, &g_featureLevel, &g_deviceContext.m_deviceContext );
-        if( SUCCEEDED( hr ) )
-            break;
-    }
-    if( FAILED( hr ) )
-        return hr;
+//
+//    WARNING("Device::CreateRenderTargetView : [")
+//
+//    UINT createDeviceFlags = 0;
+//#ifdef _DEBUG
+//    createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+//#endif
+//
+//    D3D_DRIVER_TYPE driverTypes[] =
+//    {
+//        D3D_DRIVER_TYPE_HARDWARE,
+//        D3D_DRIVER_TYPE_WARP,
+//        D3D_DRIVER_TYPE_REFERENCE,
+//    };
+//    UINT numDriverTypes = ARRAYSIZE( driverTypes );
+//
+//    D3D_FEATURE_LEVEL featureLevels[] =
+//    {
+//        D3D_FEATURE_LEVEL_11_0,
+//        D3D_FEATURE_LEVEL_10_1,
+//        D3D_FEATURE_LEVEL_10_0,
+//    };
+//    UINT numFeatureLevels = ARRAYSIZE( featureLevels );
+//
+//    //Se ajustan las variables por las nuetras 
+//    DXGI_SWAP_CHAIN_DESC sd;
+//    ZeroMemory( &sd, sizeof( sd ) );
+//    sd.BufferCount = 1;
+//    sd.BufferDesc.Width = g_window.m_width; /* */
+//    sd.BufferDesc.Height = g_window.m_height; /* */
+//    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+//    sd.BufferDesc.RefreshRate.Numerator = 60;
+//    sd.BufferDesc.RefreshRate.Denominator = 1;
+//    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+//    sd.OutputWindow = g_window.m_hWnd; /* */
+//    sd.SampleDesc.Count = 1;
+//    sd.SampleDesc.Quality = 0;
+//    sd.Windowed = TRUE;
+//
+//    //Se agarra esto y se pada a "SwapChain.cpp"
+//    
+//    for( UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++ )
+//    {
+//        g_driverType = driverTypes[driverTypeIndex];
+//        hr = D3D11CreateDeviceAndSwapChain( NULL, g_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
+//                                            D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_device.m_device, &g_featureLevel, &g_deviceContext.m_deviceContext );
+//        if( SUCCEEDED( hr ) )
+//            break;
+//    }
+//    if( FAILED( hr ) )
+//        return hr;
 
     // Create a render target view
-    ID3D11Texture2D* pBackBuffer = NULL;
-    hr = g_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
-    if( FAILED( hr ) )
-        return hr;
+    // ESTO SE COMENTA PORQUE EL BACKBUFEFR SE MANEJA DESDE EL SWAPCHAIN
+    //ID3D11Texture2D* pBackBuffer = NULL;
+    //hr = g_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
+    //if( FAILED( hr ) )
+    //    return hr;
+
+    g_swapchain.init(g_device, g_deviceContext, g_backBuffer, g_window);
     
     //Create a render target view a partir de nuestras variables 
-    g_device.CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
+    g_device.CreateRenderTargetView(g_backBuffer.m_texture, nullptr, &g_pRenderTargetView);
     //hr = g_device.m_device->CreateRenderTargetView( pBackBuffer, NULL, &g_pRenderTargetView );
-    pBackBuffer->Release();
+    g_backBuffer.m_texture->Release(); /*Luego va a ser el destroy de la textura*/
     //if( FAILED( hr ) )
     //    return hr;
 
     // Create depth stencil texture
+
+    //Agregamos nuestra función de init
+    g_depthStencil.init(g_device, g_window.m_width, g_window.m_height, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+
     //Se ajustan las variables por las nuetras 
-    D3D11_TEXTURE2D_DESC descDepth;
-    ZeroMemory( &descDepth, sizeof(descDepth) );
-    descDepth.Width = g_window.m_width; /* */
-    descDepth.Height = g_window.m_height; /* */
-    descDepth.MipLevels = 1;
-    descDepth.ArraySize = 1;
-    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    descDepth.SampleDesc.Count = 1;
-    descDepth.SampleDesc.Quality = 0;
-    descDepth.Usage = D3D11_USAGE_DEFAULT;
-    descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    descDepth.CPUAccessFlags = 0;
-    descDepth.MiscFlags = 0;
-    g_device.CreateTexture2D(&descDepth, nullptr, &g_pDepthStencil);
+    //D3D11_TEXTURE2D_DESC descDepth;
+    //ZeroMemory( &descDepth, sizeof(descDepth) );
+    //descDepth.Width = g_window.m_width; /* */
+    //descDepth.Height = g_window.m_height; /* */
+    //descDepth.MipLevels = 1;
+    //descDepth.ArraySize = 1;
+    //descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    //descDepth.SampleDesc.Count = 1;
+    //descDepth.SampleDesc.Quality = 0;
+    //descDepth.Usage = D3D11_USAGE_DEFAULT;
+    //descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    //descDepth.CPUAccessFlags = 0;
+    //descDepth.MiscFlags = 0;
+    //g_device.CreateTexture2D(&descDepth, nullptr, &g_pDepthStencil);
     //Se cambia la forma de crear la textura con nuestras variables
     //hr = g_device.m_device->CreateTexture2D( &descDepth, NULL, &g_pDepthStencil );
     //if( FAILED( hr ) )
     //    return hr;
 
     // Create the depth stencil view
-    D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-    ZeroMemory( &descDSV, sizeof(descDSV) );
-    descDSV.Format = descDepth.Format;
-    descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    descDSV.Texture2D.MipSlice = 0;
+    //D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+    //ZeroMemory( &descDSV, sizeof(descDSV) );
+    //descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    //descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    //descDSV.Texture2D.MipSlice = 0;
 
-    g_device.CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
+    //g_device.CreateDepthStencilView(g_depthStencil.m_texture, &descDSV, &g_pDepthStencilView);
+      
     //Se cambia por nuestras variables
     //hr = g_device.m_device->CreateDepthStencilView( g_pDepthStencil, &descDSV, &g_pDepthStencilView );
     //if( FAILED( hr ) )
      //   return hr;
 
-    g_deviceContext.m_deviceContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
+    g_depthStencilView.init(g_device, g_depthStencil, DXGI_FORMAT_D24_UNORM_S8_UINT);
+
+    g_deviceContext.m_deviceContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_depthStencilView.m_pDepthStencilView );
 
     // Setup the viewport
     //Se ajustan las variables por las nuetras 
@@ -568,10 +587,15 @@ void CleanupDevice()
     if( g_pVertexLayout ) g_pVertexLayout->Release();
     if( g_pVertexShader ) g_pVertexShader->Release();
     if( g_pPixelShader ) g_pPixelShader->Release();
-    if( g_pDepthStencil ) g_pDepthStencil->Release();
-    if( g_pDepthStencilView ) g_pDepthStencilView->Release();
+    //if( g_pDepthStencil ) g_pDepthStencil->Release();
+    //Se sustituye por el nuestro
+    g_depthStencil.destroy();
+    //if( g_pDepthStencilView ) g_pDepthStencilView->Release();
+    g_depthStencilView.destroy();
     if( g_pRenderTargetView ) g_pRenderTargetView->Release();
-    if( g_pSwapChain ) g_pSwapChain->Release();
+    //if( g_pSwapChain ) g_pSwapChain->Release();
+    //Pa' la liberación de memoria
+    g_swapchain.destroy();
     //if( g_deviceContext.m_deviceContext ) g_deviceContext.m_deviceContext->Release();
     //Cambiamos esto por nuestra función que libera m_deviceContext
     g_deviceContext.destroy();
@@ -615,7 +639,7 @@ void Render()
 {
     // Update our time
     static float t = 0.0f;
-    if( g_driverType == D3D_DRIVER_TYPE_REFERENCE )
+    if(g_swapchain.m_driverType == D3D_DRIVER_TYPE_REFERENCE ) /*Usamos swapchain por ahora*/
     {
         t += ( float )XM_PI * 0.0125f;
     }
@@ -635,19 +659,22 @@ void Render()
     g_vMeshColor.x = ( sinf( t * 1.0f ) + 1.0f ) * 0.5f;
     g_vMeshColor.y = ( cosf( t * 3.0f ) + 1.0f ) * 0.5f;
     g_vMeshColor.z = ( sinf( t * 5.0f ) + 1.0f ) * 0.5f;
-
+     
     //
     // Clear the back buffer
     //
     float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
+    //Esto va en el render 
     g_deviceContext.m_deviceContext->ClearRenderTargetView( g_pRenderTargetView, ClearColor );
+   
+    //Device genera los recursos, no los usa 
+    //DeviceContext establece o setea los recursos que se presentan en pantalla 
 
-    //
     // Clear the depth buffer to 1.0 (max depth)
-    //
-    g_deviceContext.m_deviceContext->ClearDepthStencilView( g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0 );
+    
+    /*g_pDepthStencilView Limpia el BackBuffer para que luego SwapChain presente el nuevo buffer en pantalla*/
+    g_depthStencilView.render(g_deviceContext);
 
-    //
     // Update variables that change once per frame
     //
     CBChangesEveryFrame cb;
@@ -671,5 +698,6 @@ void Render()
     //
     // Present our back buffer to our front buffer
     //
-    g_pSwapChain->Present( 0, 0 );
+    //g_pSwapChain->Present( 0, 0 );
+    g_swapchain.present();
 }

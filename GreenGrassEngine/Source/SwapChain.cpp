@@ -5,6 +5,7 @@
 #include "DeviceContext.h"
 #include "Window.h"
 #include "Texture.h"
+#include "SwapChain.h"
 
 void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& backBuffer, Window window)
 {
@@ -37,17 +38,17 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     unsigned int  numFeatureLevels = ARRAYSIZE(featureLevels);
 
     //Aquí se revisa el hardware y el nivel de DirectX que se tiene 
-    
+    //Se ajusatn las variables necesarias
     DXGI_SWAP_CHAIN_DESC sd;
-    memset(&sd, 0, sizeof(sd));
+    memset(&sd, 0, sizeof(sd)); /* */
     sd.BufferCount = 1;
-    sd.BufferDesc.Width = window.m_width;
-    sd.BufferDesc.Height = window.m_height;
+    sd.BufferDesc.Width = window.m_width; /* */
+    sd.BufferDesc.Height = window.m_height; /* */
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     sd.BufferDesc.RefreshRate.Numerator = 60;
     sd.BufferDesc.RefreshRate.Denominator = 1;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = window.m_hWnd;
+    sd.OutputWindow = window.m_hWnd; /* */
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;

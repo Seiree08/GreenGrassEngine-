@@ -44,6 +44,9 @@
     <ClInclude Include="Include\Texture.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\DepthStencilView.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GreenGrassEngine.cpp" />
@@ -63,6 +66,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Texture.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DepthStencilView.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
