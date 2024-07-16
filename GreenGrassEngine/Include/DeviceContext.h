@@ -21,6 +21,8 @@ public:
 		unsigned int NumViews,
 		ID3D11ShaderResourceView* const* ppShaderResourceViews);
 
+	void IASetInputLayout(ID3D11InputLayout* pInputLayout);
+
 	ID3D11DeviceContext* m_deviceContext = nullptr;
 
 

@@ -14,6 +14,7 @@
 #include "DepthStencilView.h"
 #include "RenderTargetView.h"
 #include "Viewport.h"
+#include "InputLayout.h"
  
 //--------------------------------------------------------------------------------------
 // Estas Structures se llevaron a "PreRequisites"
@@ -54,6 +55,9 @@
 //IDXGISwapChain*                     g_pSwapChain = NULL;
 //ID3D11Texture2D*                    g_pDepthStencil = NULL;
 //ID3D11DepthStencilView*             g_pDepthStencilView = NULL;   
+//ID3D11RenderTargetView*             g_pRenderTargetView = NULL;
+//ID3D11InputLayout*                  g_pVertexLayout = NULL;
+
 //Son nuestras variables personalizadas
 Window                              g_window;
 Device                              g_device;
@@ -64,12 +68,10 @@ Texture                             g_depthStencil;
 DepthStencilView                    g_depthStencilView;
 RenderTargetView                    g_renderTargetView;
 Viewport                            g_viewport;
+InputLayout                         g_inputLayout;
 /*---------------------------------------------------------------------------------------*/
-//Se creo la clase de esta
-//ID3D11RenderTargetView*             g_pRenderTargetView = NULL;
 ID3D11VertexShader*                 g_pVertexShader = NULL;
 ID3D11PixelShader*                  g_pPixelShader = NULL;
-ID3D11InputLayout*                  g_pVertexLayout = NULL;
 ID3D11Buffer*                       g_pVertexBuffer = NULL;
 ID3D11Buffer*                       g_pIndexBuffer = NULL;
 ID3D11Buffer*                       g_pCBNeverChanges = NULL;
@@ -321,7 +323,6 @@ HRESULT InitDevice()
 
     g_depthStencilView.init(g_device, g_depthStencil, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
-
     // Setup the viewport
     //Se ajustan las variables por las nuetras 
     //Se comenta pues ya lo implementamos en la clase "Viewport"
@@ -358,12 +359,33 @@ HRESULT InitDevice()
     }
 
     // Define the input layout
-    D3D11_INPUT_ELEMENT_DESC layout[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    UINT numElements = ARRAYSIZE( layout );
+    std::vector<D3D11_INPUT_ELEMENT_DESC> Layout;
+    D3D11_INPUT_ELEMENT_DESC position; 
+    position.SemanticName = "POSITION";/*Nombre que se identifica en shader*/
+    position.SemanticIndex = 0;/*Es por dónde empieza*/
+    position.Format = DXGI_FORMAT_R32G32B32_FLOAT;/*Es necesario por si agarra valores en caso de que sean 3(RGB) o 2(RG)*/
+    position.InputSlot = 0;/*Dónde se va a acomodar */
+    position.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;/*Ajusta el espacio de memoria donde se registra eso*/
+    position.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;/*Es el clasificador del ELEMENT_DES*/
+    position.InstanceDataStepRate = 0;/*Cómo se manda la información*/
+    Layout.push_back(position);/*Se guardan los elementos en el vector*/
+
+    D3D11_INPUT_ELEMENT_DESC texcoord;
+    texcoord.SemanticName = "TEXCOORD";/*Nombre que se identifica en shader*/
+    texcoord.SemanticIndex = 0;/*Es por dónde empieza*/
+    texcoord.Format = DXGI_FORMAT_R32G32_FLOAT;/*Es necesario por si agarra valores en caso de que sean 3(RGB) o 2(RG)*/
+    texcoord.InputSlot = 0;/*Dónde se va a acomodar */
+    texcoord.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;/*Ajusta el espacio de memoria donde se registra eso*/
+    texcoord.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;/*Es el clasificador del ELEMENT_DES*/
+    texcoord.InstanceDataStepRate = 0;/*Cómo se manda la información*/
+    Layout.push_back(texcoord);/*Se guardan los elementos en el vector*/
+    // Se declara para convertirlo en vector
+    //D3D11_INPUT_ELEMENT_DESC layout[] =
+    //{
+    //    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    //    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    //};
+    //UINT numElements = ARRAYSIZE( layout );
 
     // Create the input layout
     // AQUÍ SE GESTIONA LA PARTE DE INFORMACIÓN DEL SHADER
@@ -371,13 +393,15 @@ HRESULT InitDevice()
     //layout: es la estructura de datos a mandar a revisar del shader
     //numElements: es el tamaño del arreglo
     //pVSBlob: es la referecncia al VertexShader
-    hr = g_device.CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout);
+    //Se comenta y se sustituye por nuestro init
+    //hr = g_device.CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout);
+    g_inputLayout.init(g_device, Layout, pVSBlob);
     pVSBlob->Release();
-    if( FAILED( hr ) )
-        return hr;
+    //if( FAILED( hr ) )
+    //    return hr;
 
     // Set the input layout
-    g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
+    //g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
 
     // Compile the pixel shader
     ID3DBlob* pPSBlob = NULL;
@@ -593,7 +617,9 @@ void CleanupDevice()
     if( g_pCBChangesEveryFrame ) g_pCBChangesEveryFrame->Release();
     if( g_pVertexBuffer ) g_pVertexBuffer->Release();
     if( g_pIndexBuffer ) g_pIndexBuffer->Release();
-    if( g_pVertexLayout ) g_pVertexLayout->Release();
+    //if( g_pVertexLayout ) g_pVertexLayout->Release();
+    //Se sustituye por nuestro Destroy
+    g_inputLayout.destroy();
     if( g_pVertexShader ) g_pVertexShader->Release();
     if( g_pPixelShader ) g_pPixelShader->Release();
     //if( g_pDepthStencil ) g_pDepthStencil->Release();
@@ -698,7 +724,8 @@ void Render()
 
     //
     // Render the cube
-    //
+    //Se pone nuestro render del InputLayout
+    g_inputLayout.render(g_deviceContext);
     g_deviceContext.m_deviceContext->VSSetShader( g_pVertexShader, NULL, 0 );
     g_deviceContext.m_deviceContext->VSSetConstantBuffers( 0, 1, &g_pCBNeverChanges );
     g_deviceContext.m_deviceContext->VSSetConstantBuffers( 1, 1, &g_pCBChangeOnResize );

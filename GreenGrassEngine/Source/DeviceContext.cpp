@@ -34,3 +34,15 @@ void DeviceContext::PSSetShaderResources(unsigned int StartSlot,
 		m_deviceContext->PSSetShaderResources(StartSlot, NumViews, ppShaderResourceViews);
 	}
 }
+
+void DeviceContext::IASetInputLayout(ID3D11InputLayout* pInputLayout)
+{
+	//Verifica que el InputLayout esté creado y ES PRIORITARIO
+	if (pInputLayout == nullptr) {
+		ERROR("DeviceContext", "IASetInputLayout", "CHECK FOR ID3D11InputLayout* pInputLayout");
+		exit(1);
+	}
+	else {
+		m_deviceContext->IASetInputLayout(pInputLayout);
+	}
+}

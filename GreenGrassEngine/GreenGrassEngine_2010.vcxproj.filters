@@ -53,6 +53,12 @@
     <ClInclude Include="Include\Viewport.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\InputLayout.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ShaderProgram.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GreenGrassEngine.cpp" />
@@ -81,6 +87,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Viewport.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\InputLayout.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ShaderProgram.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
