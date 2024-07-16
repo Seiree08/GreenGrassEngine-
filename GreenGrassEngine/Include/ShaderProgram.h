@@ -25,13 +25,16 @@ public:
 					   			  LPCSTR szShaderModel,
 		                          ID3DBlob** ppBlobOut);
 
-	void CreateVertexShader(Device device);
-
 	void CreateInputLayout(Device device, std::vector<D3D11_INPUT_ELEMENT_DESC> Layout);
+	
+	
+	//Se comentan y se va a hacer un único método
+	void CreateShader(Device device, ShaderType type);
+	//void CreateVertexShader(Device device);
 
-	void CreatePixelShader(Device device);
+	//void CreatePixelShader(Device device);
 
-	void CreateShader(Device device, void* shaderClass);
+	//void CreateShader(Device device, void* shaderClass);
 
 public:
 	ID3D11VertexShader* m_VertexShader = nullptr;

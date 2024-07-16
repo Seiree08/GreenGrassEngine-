@@ -421,7 +421,6 @@
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup />
   <ItemGroup>
     <ClCompile Include="GreenGrassEngine.cpp" />
     <ClCompile Include="Include\Window.cpp" />

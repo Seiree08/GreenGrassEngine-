@@ -14,7 +14,9 @@
 #include "DepthStencilView.h"
 #include "RenderTargetView.h"
 #include "Viewport.h"
-#include "InputLayout.h"
+#include "ShaderProgram.h"
+//
+//#include "InputLayout.h"
  
 //--------------------------------------------------------------------------------------
 // Estas Structures se llevaron a "PreRequisites"
@@ -57,6 +59,10 @@
 //ID3D11DepthStencilView*             g_pDepthStencilView = NULL;   
 //ID3D11RenderTargetView*             g_pRenderTargetView = NULL;
 //ID3D11InputLayout*                  g_pVertexLayout = NULL;
+//ID3D11VertexShader*                 g_pVertexShader = NULL;
+//ID3D11PixelShader*                  g_pPixelShader = NULL;
+//Esta variable ya no se ocupa (ShaderProgram) y la comentamos auqneu la pusimos previamente
+//InputLayout                         g_inputLayout;
 
 //Son nuestras variables personalizadas
 Window                              g_window;
@@ -68,10 +74,8 @@ Texture                             g_depthStencil;
 DepthStencilView                    g_depthStencilView;
 RenderTargetView                    g_renderTargetView;
 Viewport                            g_viewport;
-InputLayout                         g_inputLayout;
+ShaderProgram                       g_shaderProgram;
 /*---------------------------------------------------------------------------------------*/
-ID3D11VertexShader*                 g_pVertexShader = NULL;
-ID3D11PixelShader*                  g_pPixelShader = NULL;
 ID3D11Buffer*                       g_pVertexBuffer = NULL;
 ID3D11Buffer*                       g_pIndexBuffer = NULL;
 ID3D11Buffer*                       g_pCBNeverChanges = NULL;
@@ -338,25 +342,27 @@ HRESULT InitDevice()
     //g_deviceContext.m_deviceContext->RSSetViewports( 1, &vp );
 
     // Compile the vertex shader
-    ID3DBlob* pVSBlob = NULL;
-    hr = CompileShaderFromFile( "GreenGrassEngine.fx", "VS", "vs_4_0", &pVSBlob );
-    if( FAILED( hr ) )
-    {
-        MessageBox( NULL,
-                    "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
-        return hr;
-    }
+   
+    //SE COMENTA POR QUE ESTA PARTE ESTÁ EN "SHADERPROGRAM" PARA VERTEX Y PIXEL
+    //ID3DBlob* pVSBlob = NULL;
+    //hr = CompileShaderFromFile( "GreenGrassEngine.fx", "VS", "vs_4_0", &pVSBlob );
+    //if( FAILED( hr ) )
+    //{
+    //    MessageBox( NULL,
+    //                "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
+    //    return hr;
+    //}
 
-    // Create the vertex shader
-    // hr = g_device.m_device->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), NULL, &g_pVertexShader );
-    //Se sustituye el mpetodo por nuestras variables
-    hr = g_device.CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
-    //No se le hace release al FAILED, ¿quizá por malas prácticas?...
-    if( FAILED( hr ) )
-    {    
-        pVSBlob->Release();
-        return hr;
-    }
+    //// Create the vertex shader
+    //// hr = g_device.m_device->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), NULL, &g_pVertexShader );
+    ////Se sustituye el mpetodo por nuestras variables
+    //hr = g_device.CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
+    ////No se le hace release al FAILED, ¿quizá por malas prácticas?...
+    //if( FAILED( hr ) )
+    //{    
+    //    pVSBlob->Release();
+    //    return hr;
+    //}
 
     // Define the input layout
     std::vector<D3D11_INPUT_ELEMENT_DESC> Layout;
@@ -379,6 +385,11 @@ HRESULT InitDevice()
     texcoord.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;/*Es el clasificador del ELEMENT_DES*/
     texcoord.InstanceDataStepRate = 0;/*Cómo se manda la información*/
     Layout.push_back(texcoord);/*Se guardan los elementos en el vector*/
+    
+    //Se le pasa la info del  init, device, nombre del sahder y el layout
+    g_shaderProgram.init(g_device, "GreenGrassEngine.fx", Layout);
+    //Se comenta y se sustituye por g_ShaderProgram
+    //g_inputLayout.init(g_device, Layout, pVSBlob);
     // Se declara para convertirlo en vector
     //D3D11_INPUT_ELEMENT_DESC layout[] =
     //{
@@ -395,34 +406,36 @@ HRESULT InitDevice()
     //pVSBlob: es la referecncia al VertexShader
     //Se comenta y se sustituye por nuestro init
     //hr = g_device.CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout);
-    g_inputLayout.init(g_device, Layout, pVSBlob);
-    pVSBlob->Release();
+
+    //SE COMENTA PUES SE IMPLEMENTA EN "SHADERPROGRAM"
+    //g_inputLayout.init(g_device, Layout, pVSBlob);
+    //pVSBlob->Release();
+    ////if( FAILED( hr ) )
+    ////    return hr;
+
+    //// Set the input layout
+    ////g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
+
+    //// Compile the pixel shader
+    //ID3DBlob* pPSBlob = NULL;
+    //hr = CompileShaderFromFile( "GreenGrassEngine.fx", "PS", "ps_4_0", &pPSBlob );
+    //if( FAILED( hr ) )
+    //{
+    //    MessageBox( NULL,
+    //                "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
+    //    return hr;
+    //}
+
+    //// Create the pixel shader
+    ////La diferencia de este a vertex shader es el puntero
+    ////hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
+    //hr = g_device.CreatePixelShader(pPSBlob->GetBufferPointer(), 
+    //                                pPSBlob->GetBufferSize(), 
+    //                                nullptr, 
+    //                                &g_pPixelShader);
+    //pPSBlob->Release();
     //if( FAILED( hr ) )
     //    return hr;
-
-    // Set the input layout
-    //g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
-
-    // Compile the pixel shader
-    ID3DBlob* pPSBlob = NULL;
-    hr = CompileShaderFromFile( "GreenGrassEngine.fx", "PS", "ps_4_0", &pPSBlob );
-    if( FAILED( hr ) )
-    {
-        MessageBox( NULL,
-                    "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
-        return hr;
-    }
-
-    // Create the pixel shader
-    //La diferencia de este a vertex shader es el puntero
-    //hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
-    hr = g_device.CreatePixelShader(pPSBlob->GetBufferPointer(), 
-                                    pPSBlob->GetBufferSize(), 
-                                    nullptr, 
-                                    &g_pPixelShader);
-    pPSBlob->Release();
-    if( FAILED( hr ) )
-        return hr;
 
     // Create vertex buffer
     //Almacena la informaciòn de los vèrtices de las caras del cubo
@@ -619,9 +632,10 @@ void CleanupDevice()
     if( g_pIndexBuffer ) g_pIndexBuffer->Release();
     //if( g_pVertexLayout ) g_pVertexLayout->Release();
     //Se sustituye por nuestro Destroy
-    g_inputLayout.destroy();
-    if( g_pVertexShader ) g_pVertexShader->Release();
-    if( g_pPixelShader ) g_pPixelShader->Release();
+    g_shaderProgram.destroy();
+    //g_inputLayout.destroy();
+    //if( g_pVertexShader ) g_pVertexShader->Release();
+    //if( g_pPixelShader ) g_pPixelShader->Release();
     //if( g_pDepthStencil ) g_pDepthStencil->Release();
     //Se sustituye por el nuestro
     g_depthStencil.destroy();
@@ -725,12 +739,14 @@ void Render()
     //
     // Render the cube
     //Se pone nuestro render del InputLayout
-    g_inputLayout.render(g_deviceContext);
-    g_deviceContext.m_deviceContext->VSSetShader( g_pVertexShader, NULL, 0 );
+    // Se comentan pues tenemos el ShaderProgram
+    //g_inputLayout.render(g_deviceContext);
+    //g_deviceContext.m_deviceContext->VSSetShader( g_pVertexShader, NULL, 0 );
+    //g_deviceContext.m_deviceContext->PSSetShader( g_pPixelShader, NULL, 0 );
+    g_shaderProgram.render(g_deviceContext);
     g_deviceContext.m_deviceContext->VSSetConstantBuffers( 0, 1, &g_pCBNeverChanges );
     g_deviceContext.m_deviceContext->VSSetConstantBuffers( 1, 1, &g_pCBChangeOnResize );
     g_deviceContext.m_deviceContext->VSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
-    g_deviceContext.m_deviceContext->PSSetShader( g_pPixelShader, NULL, 0 );
     g_deviceContext.m_deviceContext->PSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
     g_deviceContext.m_deviceContext->PSSetShaderResources( 0, 1, &g_pTextureRV );
     g_deviceContext.m_deviceContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );

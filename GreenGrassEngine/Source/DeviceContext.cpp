@@ -46,3 +46,35 @@ void DeviceContext::IASetInputLayout(ID3D11InputLayout* pInputLayout)
 		m_deviceContext->IASetInputLayout(pInputLayout);
 	}
 }
+
+void DeviceContext::VSSetShader(ID3D11VertexShader* pVertexShader, 
+								ID3D11ClassInstance* const* ppClassInstances, 
+								unsigned int NumClassInstances)
+{
+	//Verifica que el VertexShader estè creado
+	if (pVertexShader == nullptr) 
+	{
+		ERROR("DeviceContext", "VSSetShader", "CHECK FOR ID3D11VertexShader* pVertexShader");
+		exit(1);
+	}
+	else 
+	{
+		m_deviceContext->VSSetShader(pVertexShader, ppClassInstances, NumClassInstances);
+	}
+}
+
+void DeviceContext::PSSetShader(ID3D11PixelShader* pPixelShader, 
+								ID3D11ClassInstance* const* ppClassInstances, 
+								unsigned int NumClassInstances)
+{
+	//Verifica que el Pixel shader estè creado
+	if (pPixelShader == nullptr) 
+	{
+		ERROR("DeviceContext", "PSSetShader", "CHECK FOR ID3D11PixelShader* pPixelShader");
+		exit(1);
+	}
+	else 
+	{
+		m_deviceContext->PSSetShader(pPixelShader, ppClassInstances, NumClassInstances);
+	}
+}
