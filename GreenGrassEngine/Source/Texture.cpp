@@ -5,7 +5,7 @@
 //Se transorma en HRESULT para ver si un elemento es nulo o no
 HRESULT Texture::init(Device device, std::string textureName)
 {
-	if (device.m_device = nullptr)
+	if (device.m_device == nullptr)
 	{
 		ERROR("Texture", "init", "CHECK FOR Device device on texture loading method")
 			exit(1);
@@ -23,9 +23,7 @@ HRESULT Texture::init(Device device, std::string textureName)
 	{
 		ERROR("Texture", "init", "Error data from params [CHECH FOR string textureName -> Verify correct texture mane in filepath]")
 			exit(1);
-
 	}
-
 	return hr;
 }
 
@@ -76,7 +74,6 @@ void Texture::init(Device device,
 		ERROR("Texture", "init", "Error in data from resources [CHECK FOR CreateTexture2D]")
 			exit(1);
 	}
-	//
 }
 
 void Texture::update()

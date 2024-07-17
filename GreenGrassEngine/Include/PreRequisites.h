@@ -51,6 +51,7 @@
 {                                            \
    std::wostringstream os_;                  \
    os_ << "ERROR : " << classObj << "::" << method << " : " << "  Error in data from params [" << errorMSG << "] \n"; \
+   exit(1);                                  \
    OutputDebugStringW( os_.str().c_str() );  \
 }
 

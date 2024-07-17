@@ -431,6 +431,7 @@
     <ClCompile Include="Source\DeviceContext.cpp" />
     <ClCompile Include="Source\InputLayout.cpp" />
     <ClCompile Include="Source\RenderTargetView.cpp" />
+    <ClCompile Include="Source\SamplerState.cpp" />
     <ClCompile Include="Source\ShaderProgram.cpp" />
     <ClCompile Include="Source\SwapChain.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
@@ -456,6 +457,7 @@
     <ClInclude Include="Include\PreRequisites.h" />
     <ClInclude Include="Include\RenderTargetView.h" />
     <ClInclude Include="Include\Resource.h" />
+    <ClInclude Include="Include\SamplerState.h" />
     <ClInclude Include="Include\ShaderProgram.h" />
     <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\Texture.h" />
@@ -463,8 +465,6 @@
     <ClInclude Include="Include\Window.h" />
     <CLInclude Include="resource.h" />
     <ResourceCompile Include="GreenGrassEngine.rc" />
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
