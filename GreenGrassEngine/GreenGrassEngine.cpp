@@ -17,6 +17,8 @@
 #include "ShaderProgram.h"
 #include "Buffer.h"
 #include "SamplerState.h"
+#include "ModelLoader.h"
+#include "fbxsdk.h"
 //
 //#include "InputLayout.h"
  
@@ -92,6 +94,7 @@ Buffer                              g_CBBufferChangeOnResize;       /*proyección
 Buffer                              g_CBBufferChangesEveryFrame;    /*posición y colores del modelo*/
 Texture                             g_modelTexture;
 SamplerState                        g_sampler;
+ModelLoader                         g_model;
 /*---------------------------------------------------------------------------------------*/
 XMMATRIX                            g_World; 
 XMMATRIX                            g_View;
@@ -420,6 +423,11 @@ HRESULT InitDevice()
     
     //Se le pasa la info del  init, device, nombre del sahder y el layout
     g_shaderProgram.init(g_device, "GreenGrassEngine.fx", Layout);
+    
+    //Load Model
+    g_model.LoadModel("Models/creeper.fbx");
+
+    //int size = g_model.GetVertices().size();
     //Se comenta y se sustituye por g_ShaderProgram
     //g_inputLayout.init(g_device, Layout, pVSBlob);
     // Se declara para convertirlo en vector
@@ -468,50 +476,51 @@ HRESULT InitDevice()
     //pPSBlob->Release();
     //if( FAILED( hr ) )
     //    return hr;
-
-    // Create vertex buffer
+    
     //Almacena la informaciòn de los vèrtices de las caras del cubo
     //Los buffers sirven para contener info
-    SimpleVertex vertices[] =
-    {
-        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //SimpleVertex vertices[] =
+    //{
+    //    { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
 
-        { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
 
-        { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
 
-        { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
 
-        { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
 
-        { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-    };
+    //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
+    //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+    //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
+    //};
 
-    g_mesh.name = "Cube";
+    // Create vertex buffer
+    g_mesh.name = "creeper";
+    g_mesh.vertex = g_model.GetVertices();
 
     //Guarda la información de los vértices
-    for (const SimpleVertex& vertex : vertices)
-    {
-        g_mesh.vertex.push_back(vertex);
-    } 
+    //for (const SimpleVertex& vertex : vertices)
+    //{
+    //    g_mesh.vertex.push_back(vertex);
+    //} 
 
     /*NOTA: El static_cast<unsigned int> se está utilizando aquí para convertir
     el resultado del método size() de un std::vector a un tipo unsigned int.
@@ -573,9 +582,12 @@ HRESULT InitDevice()
         23,20,22
     };
 
-    for (unsigned int index : indices) {
-        g_mesh.index.push_back(index);
-    }
+    //for (unsigned int index : indices) {
+    //    g_mesh.index.push_back(index);
+    //}
+
+    g_mesh.index= g_model.GetIndices();
+
     g_mesh.numIndex = static_cast<unsigned int>(g_mesh.index.size());
 
     g_indexBuffer.init(g_device, g_mesh, D3D11_BIND_INDEX_BUFFER);
@@ -837,7 +849,7 @@ void Render()
     //g_deviceContext.m_deviceContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );
 
     //Set primitive Topology
-    g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     g_deviceContext.m_deviceContext->DrawIndexed( g_mesh.numIndex, 0, 0 );
 
     //
