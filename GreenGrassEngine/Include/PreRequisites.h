@@ -86,6 +86,13 @@ enum ShaderType
     VERTEX_SHADER = 1
 };
 
+enum ExtensionType
+{
+    DDS = 0,
+    PNG = 1,
+    JPG = 2
+};
+
 struct Mesh {
     std::string name;
     std::vector <SimpleVertex> vertex;

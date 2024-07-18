@@ -18,7 +18,7 @@ public:
 	/// <param name="device">: Llamamos al device para poder generar los drecursos en memoria </param>
 	/// <param name="textureName">: Llamamos al device para poder generar los drecursos en memoria </param>
 	/// 
-	HRESULT init(Device device, std::string textureName);
+	HRESULT init(Device device, std::string textureName, ExtensionType extensionType);
 	//Se transorma en HRESULT para ver si un elemento es nulo o no
 
 	/// <summary>

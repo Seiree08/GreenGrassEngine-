@@ -102,9 +102,12 @@ XMMATRIX                            g_World;
 XMMATRIX                            g_View;
 XMMATRIX                            g_Projection;
 XMFLOAT4                            g_vMeshColor( 0.7f, 0.7f, 0.7f, 1.0f );
+
 //Se crea una  clase mesh 
 Mesh                                g_mesh;
+
 Texture g_default;
+
 std::vector<Texture> modelTextures;
 
 CBNeverChanges cbNeverChanges;
@@ -325,7 +328,7 @@ HRESULT InitDevice()
     //g_backBuffer.m_texture->Release(); /*Luego va a ser el destroy de la textura*/
     //if( FAILED( hr ) )
     //    return hr;
-
+//
     // Create depth stencil texture
     //Agregamos nuestra función de init
     g_depthStencil.init(g_device, g_window.m_width, g_window.m_height, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
@@ -349,16 +352,16 @@ HRESULT InitDevice()
     //hr = g_device.m_device->CreateTexture2D( &descDepth, NULL, &g_pDepthStencil );
     //if( FAILED( hr ) )
     //    return hr;
-
+    //
     // Create the depth stencil view
     //D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
     //ZeroMemory( &descDSV, sizeof(descDSV) );
     //descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     //descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     //descDSV.Texture2D.MipSlice = 0;
-
+    //
     //g_device.CreateDepthStencilView(g_depthStencil.m_texture, &descDSV, &g_pDepthStencilView);
-      
+    //  
     //Se cambia por nuestras variables
     //hr = g_device.m_device->CreateDepthStencilView( g_pDepthStencil, &descDSV, &g_pDepthStencilView );
     //if( FAILED( hr ) )
@@ -381,7 +384,7 @@ HRESULT InitDevice()
     //g_deviceContext.m_deviceContext->RSSetViewports( 1, &vp );
 
     // Compile the vertex shader
-   
+    //
     //SE COMENTA POR QUE ESTA PARTE ESTÁ EN "SHADERPROGRAM" PARA VERTEX Y PIXEL
     //ID3DBlob* pVSBlob = NULL;
     //hr = CompileShaderFromFile( "GreenGrassEngine.fx", "VS", "vs_4_0", &pVSBlob );
@@ -391,7 +394,7 @@ HRESULT InitDevice()
     //                "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
     //    return hr;
     //}
-
+    //
     //// Create the vertex shader
     //// hr = g_device.m_device->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), NULL, &g_pVertexShader );
     ////Se sustituye el mpetodo por nuestras variables
@@ -402,7 +405,7 @@ HRESULT InitDevice()
     //    pVSBlob->Release();
     //    return hr;
     //}
-
+    
     // Define the input layout
     std::vector<D3D11_INPUT_ELEMENT_DESC> Layout;
     D3D11_INPUT_ELEMENT_DESC position; 
@@ -443,7 +446,6 @@ HRESULT InitDevice()
         indexBuffer.init(g_device, mesh, D3D11_BIND_INDEX_BUFFER);
         g_indexBuffers.push_back(indexBuffer);
     }
-
     //YA NO SE OCUPA PORQUE SE USA EN EL FOR DE ARRIBA
     //int size = g_model.GetVertices().size();
     //Se comenta y se sustituye por g_ShaderProgram
@@ -529,9 +531,7 @@ HRESULT InitDevice()
     //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
     //};
-
-
-
+    //
     // Create vertex buffer
     //g_mesh.name = "Vela";
     //g_mesh.vertex = g_model.GetVertices();
@@ -611,13 +611,43 @@ HRESULT InitDevice()
     //g_mesh.numIndex = static_cast<unsigned int>(g_mesh.index.size());
 //
     //g_indexBuffer.init(g_device, g_mesh, D3D11_BIND_INDEX_BUFFER);
-//
+
     // Inicialización de Constant Buffers
     g_CBBufferNeverChanges.init(g_device, sizeof(CBNeverChanges));
 
     g_CBBufferChangeOnResize.init(g_device, sizeof(CBChangeOnResize));
 
     g_CBBufferChangesEveryFrame.init(g_device, sizeof(CBChangesEveryFrame));
+
+    Texture Vela_Char_BaseColor;
+    Vela_Char_BaseColor.init(g_device, "Textures/Vela/Vela_Char_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Corneas_BaseColor;
+    Vela_Corneas_BaseColor.init(g_device, "Textures/Vela/Vela_Corneas_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Gun_BaseColor;
+    Vela_Gun_BaseColor.init(g_device, "Textures/Vela/Vela_Gun_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Legs_BaseColor;
+    Vela_Legs_BaseColor.init(g_device, "Textures/Vela/Vela_Legs_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Mechanical_BaseColor;
+    Vela_Mechanical_BaseColor.init(g_device, "Textures/Vela/Vela_Mechanical_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Plate_BaseColor;
+    Vela_Plate_BaseColor.init(g_device, "Textures/Vela/Vela_Plate_BaseColor.png", ExtensionType::PNG);
+
+    Texture Vela_Visor_BaseColor;
+    Vela_Visor_BaseColor.init(g_device, "Textures/Vela/Vela_Visor_BaseColor.png", ExtensionType::PNG);
+
+    modelTextures.push_back(Vela_Corneas_BaseColor);        //1
+    modelTextures.push_back(Vela_Gun_BaseColor);            //2
+    modelTextures.push_back(Vela_Visor_BaseColor);          //3
+    modelTextures.push_back(Vela_Legs_BaseColor);           //4
+    modelTextures.push_back(Vela_Mechanical_BaseColor);     //5
+    modelTextures.push_back(Vela_Char_BaseColor);           //6
+    modelTextures.push_back(Vela_Plate_BaseColor);          //7
+
     //Esta info se procesa en un buffer
     //bd.Usage = D3D11_USAGE_DEFAULT;
     //bd.ByteWidth = sizeof( WORD ) * 36;
@@ -674,7 +704,8 @@ HRESULT InitDevice()
     //if( FAILED( hr ) )
     //    return hr;
     //Inizializa cualquier textura desde memopria
-    g_default.init(g_device, "Textures/Default.png");       
+    //g_default.init(g_device, "Textures/Default.png", ExtensionType::PNG);   
+    //     
     // Create the sample state
     //D3D11_SAMPLER_DESC sampDesc;
     //ZeroMemory( &sampDesc, sizeof(sampDesc) );
@@ -881,17 +912,15 @@ void Render()
     {
         g_vertexBuffers[i].render(g_deviceContext, 0, 1);
         g_indexBuffers[i].render(g_deviceContext, DXGI_FORMAT_R32_UINT);
-        //if (i <= modelTextures.size() - 1)
-        //{
-        //    modelTextures[i].render(g_deviceContext, 0, 1);
-        //}
-        //else
-        //{
-        //    g_default.render(g_deviceContext, 0, 1);
-        //}
-
-        g_default.render(g_deviceContext, 0, 1);
-
+        if (i <= modelTextures.size() - 1)
+        {
+            modelTextures[i].render(g_deviceContext, 0, 1);
+        }
+        else
+        {
+            g_default.render(g_deviceContext, 0, 1);
+        }
+        
         g_sampler.render(g_deviceContext, 0, 1);
 
         //Actualiza los buffers constante

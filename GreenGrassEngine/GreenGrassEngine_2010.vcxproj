@@ -461,6 +461,7 @@
     <ClInclude Include="Include\Resource.h" />
     <ClInclude Include="Include\SamplerState.h" />
     <ClInclude Include="Include\ShaderProgram.h" />
+    <ClInclude Include="Include\stb_image.h" />
     <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\Texture.h" />
     <ClInclude Include="Include\Viewport.h" />
