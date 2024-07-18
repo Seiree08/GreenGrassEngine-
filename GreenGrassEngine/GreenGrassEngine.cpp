@@ -87,8 +87,10 @@ DepthStencilView                    g_depthStencilView;
 RenderTargetView                    g_renderTargetView;
 Viewport                            g_viewport;
 ShaderProgram                       g_shaderProgram;
-Buffer                              g_vertexBuffer;
-Buffer                              g_indexBuffer;
+//Buffer                              g_vertexBuffer;
+std::vector<Buffer>                 g_vertexBuffers;
+//Buffer                              g_indexBuffer;
+std::vector<Buffer>                 g_indexBuffers;
 Buffer                              g_CBBufferNeverChanges;         /*vista de cámara*/
 Buffer                              g_CBBufferChangeOnResize;       /*proyección de cámara*/
 Buffer                              g_CBBufferChangesEveryFrame;    /*posición y colores del modelo*/
@@ -102,6 +104,8 @@ XMMATRIX                            g_Projection;
 XMFLOAT4                            g_vMeshColor( 0.7f, 0.7f, 0.7f, 1.0f );
 //Se crea una  clase mesh 
 Mesh                                g_mesh;
+Texture g_default;
+std::vector<Texture> modelTextures;
 
 CBNeverChanges cbNeverChanges;
 CBChangeOnResize cbChangesOnResize;
@@ -425,8 +429,22 @@ HRESULT InitDevice()
     g_shaderProgram.init(g_device, "GreenGrassEngine.fx", Layout);
     
     //Load Model
-    g_model.LoadModel("Models/creeper.fbx");
+    g_model.LoadModel("Models/Vela2.fbx");
 
+    for (auto& mesh : g_model.meshes)
+    {
+        //Create Vertex Buffer
+        Buffer vertexBuffer;
+        vertexBuffer.init(g_device, mesh, D3D11_BIND_VERTEX_BUFFER);
+        g_vertexBuffers.push_back(vertexBuffer);
+
+        // // Create index buffer
+        Buffer indexBuffer;
+        indexBuffer.init(g_device, mesh, D3D11_BIND_INDEX_BUFFER);
+        g_indexBuffers.push_back(indexBuffer);
+    }
+
+    //YA NO SE OCUPA PORQUE SE USA EN EL FOR DE ARRIBA
     //int size = g_model.GetVertices().size();
     //Se comenta y se sustituye por g_ShaderProgram
     //g_inputLayout.init(g_device, Layout, pVSBlob);
@@ -437,7 +455,7 @@ HRESULT InitDevice()
     //    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     //};
     //UINT numElements = ARRAYSIZE( layout );
-
+        //
     // Create the input layout
     // AQUÍ SE GESTIONA LA PARTE DE INFORMACIÓN DEL SHADER
     //hr = g_device.m_device->CreateInputLayout( layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout );
@@ -446,16 +464,16 @@ HRESULT InitDevice()
     //pVSBlob: es la referecncia al VertexShader
     //Se comenta y se sustituye por nuestro init
     //hr = g_device.CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &g_pVertexLayout);
-
+//
     //SE COMENTA PUES SE IMPLEMENTA EN "SHADERPROGRAM"
     //g_inputLayout.init(g_device, Layout, pVSBlob);
     //pVSBlob->Release();
     ////if( FAILED( hr ) )
     ////    return hr;
-
+//
     //// Set the input layout
     ////g_deviceContext.m_deviceContext->IASetInputLayout( g_pVertexLayout );
-
+//
     //// Compile the pixel shader
     //ID3DBlob* pPSBlob = NULL;
     //hr = CompileShaderFromFile( "GreenGrassEngine.fx", "PS", "ps_4_0", &pPSBlob );
@@ -465,7 +483,7 @@ HRESULT InitDevice()
     //                "The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", "Error", MB_OK );
     //    return hr;
     //}
-
+//
     //// Create the pixel shader
     ////La diferencia de este a vertex shader es el puntero
     ////hr = g_device.m_device->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), NULL, &g_pPixelShader );
@@ -476,7 +494,7 @@ HRESULT InitDevice()
     //pPSBlob->Release();
     //if( FAILED( hr ) )
     //    return hr;
-    
+    //
     //Almacena la informaciòn de los vèrtices de las caras del cubo
     //Los buffers sirven para contener info
     //SimpleVertex vertices[] =
@@ -485,120 +503,121 @@ HRESULT InitDevice()
     //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
+//
     //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
+//
     //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
     //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
+//
     //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
+//
     //    { XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
+//
     //    { XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
     //    { XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
     //    { XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
     //};
 
+
+
     // Create vertex buffer
-    g_mesh.name = "creeper";
-    g_mesh.vertex = g_model.GetVertices();
-
-    //Guarda la información de los vértices
-    //for (const SimpleVertex& vertex : vertices)
-    //{
-    //    g_mesh.vertex.push_back(vertex);
-    //} 
-
-    /*NOTA: El static_cast<unsigned int> se está utilizando aquí para convertir
-    el resultado del método size() de un std::vector a un tipo unsigned int.
-    El método size() devuelve un valor del tipo std::size_t, que es un tipo
-    específico de tamaño no negativo. En algunas plataformas, std::size_t puede
-    ser de un tamaño diferente a unsigned int.*/
-    //Se almacena el tamaño de vétices 
-    g_mesh.numVertex = static_cast<unsigned int>(g_mesh.vertex.size());
-
-    //Se incializa el buffer con la bandera de vertex buffer
-    g_vertexBuffer.init(g_device, g_mesh, D3D11_BIND_VERTEX_BUFFER);
-
-    //ESTA PARTE ES DEL BUFFER
-    //D3D11_BUFFER_DESC bd;
-    //ZeroMemory( &bd, sizeof(bd) );
-    //bd.Usage = D3D11_USAGE_DEFAULT;
-    //bd.ByteWidth = sizeof( SimpleVertex ) * 24;
-    //bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    //bd.CPUAccessFlags = 0;
-    //D3D11_SUBRESOURCE_DATA InitData;
-    //ZeroMemory( &InitData, sizeof(InitData) );
-    //InitData.pSysMem = vertices;
-    ////hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pVertexBuffer );
-    ////este bufer tiene InitialData
-    ////este es el buffer del VertexShader
-    //hr = g_device.CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
-    //if( FAILED( hr ) )
-    //    return hr;
-
-    //// Set vertex buffer
-    //UINT stride = sizeof( SimpleVertex );
-    //UINT offset = 0;
-    //g_deviceContext.m_deviceContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
-
-    // Create index buffer
-    // Create vertex buffer
-    //Es la referencia de sonde se encuentran los recursos, con qué se conecta cada vèrtice 
-    unsigned int indices[] =
-    {
-    //Empieza por una cara
-        //El 3 dice que empieza por ahí y que se conceta con otros a partir del 3
-        3,1,0,
-        //Aquí hace la conexión 
-        2,1,3,
-    //Esta es otra cara y así
-        6,4,5,
-        7,4,6,
-
-        11,9,8,
-        10,9,11,
-
-        14,12,13,
-        15,12,14,
-
-        19,17,16,
-        18,17,19,
-
-        22,20,21,
-        23,20,22
-    };
-
-    //for (unsigned int index : indices) {
-    //    g_mesh.index.push_back(index);
-    //}
-
-    g_mesh.index= g_model.GetIndices();
-
-    g_mesh.numIndex = static_cast<unsigned int>(g_mesh.index.size());
-
-    g_indexBuffer.init(g_device, g_mesh, D3D11_BIND_INDEX_BUFFER);
-
+    //g_mesh.name = "Vela";
+    //g_mesh.vertex = g_model.GetVertices();
+//
+    ////Guarda la información de los vértices
+    ////for (const SimpleVertex& vertex : vertices)
+    ////{
+    ////    g_mesh.vertex.push_back(vertex);
+    ////} 
+    ////
+    ////NOTA: El static_cast<unsigned int> se está utilizando aquí para convertir
+    ////el resultado del método size() de un std::vector a un tipo unsigned int.
+    ////El método size() devuelve un valor del tipo std::size_t, que es un tipo
+    ////específico de tamaño no negativo. En algunas plataformas, std::size_t puede
+    ////ser de un tamaño diferente a unsigned int.
+    ////Se almacena el tamaño de vétices 
+    //g_mesh.numVertex = static_cast<unsigned int>(g_mesh.vertex.size());
+//
+    ////Se incializa el buffer con la bandera de vertex buffer
+    //g_vertexBuffer.init(g_device, g_mesh, D3D11_BIND_VERTEX_BUFFER);
+//
+    ////ESTA PARTE ES DEL BUFFER
+    ////D3D11_BUFFER_DESC bd;
+    ////ZeroMemory( &bd, sizeof(bd) );
+    ////bd.Usage = D3D11_USAGE_DEFAULT;
+    ////bd.ByteWidth = sizeof( SimpleVertex ) * 24;
+    ////bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    ////bd.CPUAccessFlags = 0;
+    ////D3D11_SUBRESOURCE_DATA InitData;
+    ////ZeroMemory( &InitData, sizeof(InitData) );
+    ////InitData.pSysMem = vertices;
+    //////hr = g_device.m_device->CreateBuffer( &bd, &InitData, &g_pVertexBuffer );
+    //////este bufer tiene InitialData
+    //////este es el buffer del VertexShader
+    ////hr = g_device.CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
+    ////if( FAILED( hr ) )
+    ////    return hr;
+    ////
+    ////// Set vertex buffer
+    ////UINT stride = sizeof( SimpleVertex );
+    ////UINT offset = 0;
+    ////g_deviceContext.m_deviceContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
+    ////
+    //// Create index buffer
+    //// Create vertex buffer
+    ////Es la referencia de sonde se encuentran los recursos, con qué se conecta cada vèrtice 
+    ////unsigned int indices[] =
+    ////{
+    //////Empieza por una cara
+    ////    //El 3 dice que empieza por ahí y que se conceta con otros a partir del 3
+    ////    3,1,0,
+    ////    //Aquí hace la conexión 
+    ////    2,1,3,
+    //////Esta es otra cara y así
+    ////    6,4,5,
+    ////    7,4,6,
+    ////
+    ////    11,9,8,
+    ////    10,9,11,
+    ////
+    ////    14,12,13,
+    ////    15,12,14,
+    ////
+    ////    19,17,16,
+    ////    18,17,19,
+    ////
+    ////    22,20,21,
+    ////    23,20,22
+    ////};
+    ////
+    ////for (unsigned int index : indices) {
+    ////    g_mesh.index.push_back(index);
+    ////}
+//
+    //g_mesh.index= g_model.GetIndices();
+//
+    //g_mesh.numIndex = static_cast<unsigned int>(g_mesh.index.size());
+//
+    //g_indexBuffer.init(g_device, g_mesh, D3D11_BIND_INDEX_BUFFER);
+//
     // Inicialización de Constant Buffers
     g_CBBufferNeverChanges.init(g_device, sizeof(CBNeverChanges));
 
     g_CBBufferChangeOnResize.init(g_device, sizeof(CBChangeOnResize));
 
     g_CBBufferChangesEveryFrame.init(g_device, sizeof(CBChangesEveryFrame));
-
     //Esta info se procesa en un buffer
     //bd.Usage = D3D11_USAGE_DEFAULT;
     //bd.ByteWidth = sizeof( WORD ) * 36;
@@ -609,17 +628,17 @@ HRESULT InitDevice()
     ////este bufer tiene InitialData
     ////este es el buffer del IndexShader
     //hr = g_device.CreateBuffer(&bd, &InitData, &g_pIndexBuffer);
-
+    //
     //if( FAILED( hr ) )
     //    return hr;
-
+    //
     //// Set index buffer
     //g_deviceContext.m_deviceContext->IASetIndexBuffer( g_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
-
+    //
     ////Set primitive topology
     //// Cambia la forma en que se construye la figura según los vértices
     //g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
+    //
     //// Create the constant buffers
     //bd.Usage = D3D11_USAGE_DEFAULT;
     //bd.ByteWidth = sizeof(CBNeverChanges);
@@ -629,14 +648,14 @@ HRESULT InitDevice()
     //bd.CPUAccessFlags = 0;
     ////hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBNeverChanges );
     //hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBNeverChanges);
-
+    //
     //if( FAILED( hr ) )
     //    return hr;
     //
     //bd.ByteWidth = sizeof(CBChangeOnResize);
     ////hr = g_device.m_device->CreateBuffer( &bd, NULL, &g_pCBChangeOnResize );
     //hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBChangeOnResize);
-
+//
     //if( FAILED( hr ) )
     //    return hr;
     //
@@ -645,18 +664,17 @@ HRESULT InitDevice()
     //hr = g_device.CreateBuffer(&bd, nullptr, &g_pCBChangesEveryFrame);
     //if( FAILED( hr ) )
     //    return hr;
-
+    //
     // Load the Texture
     //Cómo lo dice, crea una textura a partir de una imagen cargada
     //Aqui verifica si el valor de retorno es correcto
-
+    //
     //Se usa nuestra variable
     //hr = D3DX11CreateShaderResourceViewFromFile( g_device.m_device, "seafloor.dds", NULL, NULL, &g_pTextureRV, NULL );
     //if( FAILED( hr ) )
     //    return hr;
     //Inizializa cualquier textura desde memopria
-    g_modelTexture.init(g_device, "seafloor.dds");       
-
+    g_default.init(g_device, "Textures/Default.png");       
     // Create the sample state
     //D3D11_SAMPLER_DESC sampDesc;
     //ZeroMemory( &sampDesc, sizeof(sampDesc) );
@@ -687,7 +705,7 @@ HRESULT InitDevice()
     cbNeverChanges.mView = XMMatrixTranspose( g_View );
     //Se comenta y se sustituye por las de nuestra calse buffer 
     //g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBNeverChanges, 0, NULL, &cbNeverChanges, 0, 0 );
-
+    //
     // Initialize the projection matrix
     //Se ajustan las variables por las nuetras 
     g_Projection = XMMatrixPerspectiveFovLH( XM_PIDIV4, g_window.m_width /* */ / (FLOAT)g_window.m_height /* */, 0.01f, 100.0f);
@@ -708,7 +726,11 @@ void CleanupDevice()
 
     //if( g_pSamplerLinear ) g_pSamplerLinear->Release();
     g_sampler.destroy();
-    g_modelTexture.destroy();
+    for (auto& tex : modelTextures)
+    {
+        tex.destroy();
+    }
+    //g_modelTexture.destroy();
     //if( g_pTextureRV ) g_pTextureRV->Release();
     //Se sustituyen por las nuestras
     //if( g_pCBNeverChanges ) g_pCBNeverChanges->Release();
@@ -716,14 +738,25 @@ void CleanupDevice()
     //if( g_pCBChangesEveryFrame ) g_pCBChangesEveryFrame->Release();
     //if( g_pVertexBuffer ) g_pVertexBuffer->Release();
     //if( g_pIndexBuffer ) g_pIndexBuffer->Release();
-    //if( g_pVertexLayout ) g_pVertexLayout->Release
+    //if( g_pVertexLayout ) g_pVertexLayout->Release();
+    g_default.destroy();
     g_CBBufferNeverChanges.destroy();
     g_CBBufferChangeOnResize.destroy();
     g_CBBufferChangesEveryFrame.destroy();
-    g_vertexBuffer.destroy();
-    g_indexBuffer.destroy();
-    //Se sustituye por nuestro Destroy
+
+    for (auto& vertexBuffer : g_vertexBuffers)
+    {
+        vertexBuffer.destroy();
+    }
+    for (auto& indexBuffer : g_indexBuffers)
+    {
+        indexBuffer.destroy();
+    }
+
     g_shaderProgram.destroy();
+    //g_vertexBuffers.destroy();
+    //g_indexBuffers.destroy();
+    //Se sustituye por nuestro Destroy
     //g_inputLayout.destroy();
     //if( g_pVertexShader ) g_pVertexShader->Release();
     //if( g_pPixelShader ) g_pPixelShader->Release();
@@ -776,19 +809,25 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 //Update every frame, recibe actualizaciones lógicas
 void Update(float DeltaTime)
 {
-    //Update contant buffers
+    // Rotate cube around the origin
+    XMVECTOR translation = XMVectorSet(0.0f, -2.0f, 0.0f, 0.0f); // Traslación en x=1, y=2, z=3
+    XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(260), XMConvertToRadians(DeltaTime * 50), 0.0f); // Rotación en X=180, Y=180, Z=0
+    XMVECTOR scale = XMVectorSet(.03f, .03f, .03f, 0.0f); // Escala por 2 en x, y, z
+
+    // Combinar las transformaciones en una matriz de mundo
+    g_World = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(rotation) * XMMatrixTranslationFromVector(translation);
+    // Rotate cube around the origin
+
+    //g_World = XMMatrixRotationZ(DeltaTime);
+    // Modify the color
+   /* g_vMeshColor.x = (sinf(DeltaTime * 1.0f) + 1.0f) * 0.5f;
+    g_vMeshColor.y = (cosf(DeltaTime * 3.0f) + 1.0f) * 0.5f;
+    g_vMeshColor.z = (sinf(DeltaTime * 5.0f) + 1.0f) * 0.5f;*/
+    //Update Constant Buffers
     g_CBBufferNeverChanges.update(g_deviceContext, 0, nullptr, &cbNeverChanges, 0, 0);
     g_CBBufferChangeOnResize.update(g_deviceContext, 0, nullptr, &cbChangesOnResize, 0, 0);
 
-    // Rotate cube around the origin
-    g_World = XMMatrixRotationY( DeltaTime );
-
-    // Modify the color
-    g_vMeshColor.x = ( sinf( DeltaTime * 1.0f ) + 1.0f ) * 0.5f;
-    g_vMeshColor.y = ( cosf( DeltaTime * 3.0f ) + 1.0f ) * 0.5f;
-    g_vMeshColor.z = ( sinf( DeltaTime * 5.0f ) + 1.0f ) * 0.5f;
-
-    cb.mWorld = XMMatrixTranspose( g_World );
+    cb.mWorld = XMMatrixTranspose(g_World);
     cb.vMeshColor = g_vMeshColor;
     g_CBBufferChangesEveryFrame.update(g_deviceContext, 0, nullptr, &cb, 0, 0);
 }
@@ -817,11 +856,12 @@ void Render()
     /*g_pDepthStencilView Limpia el BackBuffer para que luego SwapChain presente el nuevo buffer en pantalla*/
     g_depthStencilView.render(g_deviceContext); 
 
+    g_shaderProgram.render(g_deviceContext);
     // Update variables that change once per frame
     //
     //Se sustituye por la nuestra
     //g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBChangesEveryFrame, 0, NULL, &cb, 0, 0 );
-
+    //
     //
     // Render the cube
     //Se pone nuestro render del InputLayout
@@ -829,29 +869,56 @@ void Render()
     //g_inputLayout.render(g_deviceContext);
     //g_deviceContext.m_deviceContext->VSSetShader( g_pVertexShader, NULL, 0 );
     //g_deviceContext.m_deviceContext->PSSetShader( g_pPixelShader, NULL, 0 );
-    g_shaderProgram.render(g_deviceContext);
     //Se sustituyen por las nuestras 
     //g_deviceContext.m_deviceContext->VSSetConstantBuffers( 0, 1, &g_pCBNeverChanges );
     //g_deviceContext.m_deviceContext->VSSetConstantBuffers( 1, 1, &g_pCBChangeOnResize );
     //g_deviceContext.m_deviceContext->VSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
-    g_vertexBuffer.render(g_deviceContext, 0, 1);
-    g_indexBuffer.render(g_deviceContext, DXGI_FORMAT_R32_UINT);
+    //g_vertexBuffers.render(g_deviceContext, 0, 1);
+    //g_indexBuffers.render(g_deviceContext, DXGI_FORMAT_R32_UINT);
 
-    g_CBBufferNeverChanges.render(g_deviceContext, 0, 1); // Slot 0
-    g_CBBufferChangeOnResize.render(g_deviceContext, 1, 1); // Slot 1
-    g_CBBufferChangesEveryFrame.renderModel(g_deviceContext, 2, 1); // Slot 2
+     //Render los models
+    for (size_t i = 0; i < g_model.meshes.size(); i++)
+    {
+        g_vertexBuffers[i].render(g_deviceContext, 0, 1);
+        g_indexBuffers[i].render(g_deviceContext, DXGI_FORMAT_R32_UINT);
+        //if (i <= modelTextures.size() - 1)
+        //{
+        //    modelTextures[i].render(g_deviceContext, 0, 1);
+        //}
+        //else
+        //{
+        //    g_default.render(g_deviceContext, 0, 1);
+        //}
 
-    //g_deviceContext.m_deviceContext->PSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
-    //Se usa nuestra variable
-    //g_deviceContext.m_deviceContext->PSSetShaderResources( 0, 1, &g_pTextureRV );
-    g_modelTexture.render(g_deviceContext, 0, 1);
-    g_sampler.render(g_deviceContext, 0, 1);
-    //g_deviceContext.m_deviceContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );
+        g_default.render(g_deviceContext, 0, 1);
 
-    //Set primitive Topology
-    g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    g_deviceContext.m_deviceContext->DrawIndexed( g_mesh.numIndex, 0, 0 );
+        g_sampler.render(g_deviceContext, 0, 1);
 
+        //Actualiza los buffers constante
+        g_CBBufferNeverChanges.render(g_deviceContext, 0, 1); // Slot 0
+        g_CBBufferChangeOnResize.render(g_deviceContext, 1, 1); // Slot 1
+        g_CBBufferChangesEveryFrame.renderModel(g_deviceContext, 2, 1); // Slot 2
+        //Set primitve topology
+
+        g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        g_deviceContext.m_deviceContext->DrawIndexed(g_model.meshes[i].numIndex, 0, 0);
+    }
+
+    //g_CBBufferNeverChanges.render(g_deviceContext, 0, 1); // Slot 0
+    //g_CBBufferChangeOnResize.render(g_deviceContext, 1, 1); // Slot 1
+    //g_CBBufferChangesEveryFrame.renderModel(g_deviceContext, 2, 1); // Slot 2
+    ////
+    ////g_deviceContext.m_deviceContext->PSSetConstantBuffers( 2, 1, &g_pCBChangesEveryFrame );
+    ////Se usa nuestra variable
+    ////g_deviceContext.m_deviceContext->PSSetShaderResources( 0, 1, &g_pTextureRV );
+    //g_modelTexture.render(g_deviceContext, 0, 1);
+    //g_sampler.render(g_deviceContext, 0, 1);
+    ////g_deviceContext.m_deviceContext->PSSetSamplers( 0, 1, &g_pSamplerLinear );
+    ////
+    ////Set primitive Topology
+    //g_deviceContext.m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    //g_deviceContext.m_deviceContext->DrawIndexed( g_mesh.numIndex, 0, 0 );
+    //
     //
     // Present our back buffer to our front buffer
     //

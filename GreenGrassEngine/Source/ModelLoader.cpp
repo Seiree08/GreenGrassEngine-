@@ -53,10 +53,14 @@ bool ModelLoader::LoadModel(const std::string& filepath)
 	MESSAGE("ModelLoader", "LoasModel", "Succesfully imported the FBX scene from file: " << filepath.c_str())
 
 	//Procesa la escena
-	FbxNode* rootNode = lScene->GetRootNode();
-	if (rootNode)
+	FbxNode* lRootNode = lScene->GetRootNode();
+	if (lRootNode)
 	{
-		ProcessNode(rootNode);
+		for (int i = 0; i < lRootNode->GetChildCount(); i++)
+		{
+			FbxSurfaceMaterial* material = lScene->GetMaterial(i);
+			ProcessNode(lRootNode);
+		}
 	}
 
 	//Puedes proceder a la escena como sea requerida
@@ -65,13 +69,15 @@ bool ModelLoader::LoadModel(const std::string& filepath)
 
 void ModelLoader::ProcessNode(FbxNode* node)
 {
-	//Procesa todos los node's meshes
-	if (node->GetNodeAttribute())
-	{
-		if (node->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh)
-		{
-			ProcessMesh(node->GetMesh());
-		}
+    // Verificar si el nodo tiene un atributo asociado
+    if (node->GetNodeAttribute())
+    {
+        // Verificar si el atributo es de tipo malla (mesh)
+        if (node->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh)
+        {
+            // Procesar la malla contenida en el nodo
+            ProcessMesh(node);
+        }
 	}
 
 	//Recursivamente procesa todos los nodos
@@ -81,47 +87,144 @@ void ModelLoader::ProcessNode(FbxNode* node)
 	}
 }
 
-void ModelLoader::ProcessMesh(FbxMesh* mesh)
+void ModelLoader::ProcessMesh(FbxNode* node)
 {
-	int polygonCount = mesh->GetPolygonCount();
-	vertices.reserve(polygonCount * 3);
-	indices.reserve(polygonCount * 3);
+	FbxMesh* mesh = node->GetMesh();
+	if (!mesh) return;
 
-	//Obtiene el UV set name
-	const char* uvSetName = nullptr;
-	FbxStringList uvSetNameList;
-	mesh->GetUVSetNames(uvSetNameList);
-	if (uvSetNameList.GetCount() > 0)
+	std::vector<SimpleVertex> vertices;
+	std::vector<UINT> indices;
+
+	// Procesar vértices y normales
+	for (int i = 0; i < mesh->GetControlPointsCount(); i++) 
 	{
-		uvSetName = uvSetNameList.GetStringAt(0);
-	}
-	else
-	{
-		ERROR("ModelLoader", "ProcessMesh", "No UV set found in the mesh")
-			return;
+		FbxVector4* controlPoint = mesh->GetControlPoints();
+		SimpleVertex vertex;
+		vertex.Pos = XMFLOAT3((float)controlPoint[i][0],
+					   		  (float)controlPoint[i][1],
+							  (float)controlPoint[i][2]);
+		vertices.push_back(vertex);
 	}
 
-	//Obitne los vèrtices e ìndices
-	for (int i = 0; i < polygonCount; i++)
+	// Procesar UVs
+	if (mesh->GetElementUVCount() > 0) 
 	{
-		for (int j = 0; j < 3; j++)
+		FbxGeometryElementUV* uvElement = mesh->GetElementUV(0);
+		FbxGeometryElement::EMappingMode mappingMode = uvElement->GetMappingMode();
+		FbxGeometryElement::EReferenceMode referenceMode = uvElement->GetReferenceMode();
+		int polyIndexCounter = 0;
+
+		for (int polyIndex = 0; polyIndex < mesh->GetPolygonCount(); polyIndex++) 
 		{
-			SimpleVertex vertex;
+			int polySize = mesh->GetPolygonSize(polyIndex);
+			for (int vertIndex = 0; vertIndex < polySize; vertIndex++) 
+			{
+				int controlPointIndex = mesh->GetPolygonVertex(polyIndex, vertIndex);
 
-			//Obtiene las posicones del vertex
-			int controlPointIndex = mesh->GetPolygonVertex(i, j);
-			FbxVector4 pos = mesh->GetControlPointAt(controlPointIndex);
-			vertex.Pos = XMFLOAT3(static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2]));
+				int uvIndex = -1;
+				if (mappingMode == FbxGeometryElement::eByControlPoint) 
+				{
+					if (referenceMode == FbxGeometryElement::eDirect) 
+					{
+						uvIndex = controlPointIndex;
+					}
+					else if (referenceMode == FbxGeometryElement::eIndexToDirect) 
+					{
+						uvIndex = uvElement->GetIndexArray().GetAt(controlPointIndex);
+					}
+				}
+				else if (mappingMode == FbxGeometryElement::eByPolygonVertex) 
+				{
+					if (referenceMode == FbxGeometryElement::eDirect || referenceMode == FbxGeometryElement::eIndexToDirect) 
+					{
+						uvIndex = uvElement->GetIndexArray().GetAt(polyIndexCounter);
+						polyIndexCounter++;
+					}
+				}
 
-			//Obtiene las coordenadas de textira
-			FbxVector2 texCoord;
-			bool unmapped;
-			mesh->GetPolygonVertexUV(i, j, uvSetName, texCoord, unmapped);
-			vertex.Tex = XMFLOAT2(static_cast<float>(texCoord[0]), static_cast<float>(texCoord[1]));
+				if (uvIndex != -1) 
+				{
+					FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
+					vertices[controlPointIndex].Tex = XMFLOAT2((float)uv[0], -(float)uv[1]);
+				}
+			}
+		}
+	}
 
-			//Agrega el vertex a la lista
-			vertices.push_back(vertex);
-			indices.push_back(vertices.size() - 1);
+	// Procesar índices
+	for (int i = 0; i < mesh->GetPolygonCount(); i++) 
+	{
+		for (int j = 0; j < mesh->GetPolygonSize(i); j++) 
+		{
+			indices.push_back(mesh->GetPolygonVertex(i, j));
+		}
+	}
+
+	Mesh meshData;
+	meshData.vertex = vertices;
+	meshData.index = indices;
+	meshData.name = node->GetName();
+	meshData.numVertex = vertices.size();
+	meshData.numIndex = indices.size();
+
+	meshes.push_back(meshData);
+	//ANTERIOR LÓGICA
+	//int polygonCount = mesh->GetPolygonCount();
+	//vertices.reserve(polygonCount * 3);
+	//indices.reserve(polygonCount * 3);
+	////Obtiene el UV set name
+	//const char* uvSetName = nullptr;
+	//FbxStringList uvSetNameList;
+	//mesh->GetUVSetNames(uvSetNameList);
+	//if (uvSetNameList.GetCount() > 0)
+	//{
+	//	uvSetName = uvSetNameList.GetStringAt(0);
+	//}
+	//else
+	//{
+	//	ERROR("ModelLoader", "ProcessMesh", "No UV set found in the mesh")
+	//		return;
+	//}
+	////Obitne los vèrtices e ìndices
+	//for (int i = 0; i < polygonCount; i++)
+	//{
+	//	for (int j = 0; j < 3; j++)
+	//	{
+	//		SimpleVertex vertex;
+	//		//Obtiene las posicones del vertex
+	//		int controlPointIndex = mesh->GetPolygonVertex(i, j);
+	//		FbxVector4 pos = mesh->GetControlPointAt(controlPointIndex);
+	//		vertex.Pos = XMFLOAT3(static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2]));
+	//		//Obtiene las coordenadas de textira
+	//		FbxVector2 texCoord;
+	//		bool unmapped;
+	//		mesh->GetPolygonVertexUV(i, j, uvSetName, texCoord, unmapped);
+	//		vertex.Tex = XMFLOAT2(static_cast<float>(texCoord[0]), static_cast<float>(texCoord[1]));
+	//		//Agrega el vertex a la lista
+	//		vertices.push_back(vertex);
+	//		indices.push_back(vertices.size() - 1);
+	//	}
+	//}
+}
+
+void ModelLoader::ProcessMaterials(FbxSurfaceMaterial* material)
+{
+	// Procesar el material para obtener las texturas asociadas
+	if (material)
+	{
+		//Desde el Fbx se ectraen los materiales del objeto y se guardam el la lista de texturas
+		FbxProperty prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+		if (prop.IsValid())
+		{
+			int textureCount = prop.GetSrcObjectCount<FbxTexture>();
+			for (int i = 0; i < textureCount; ++i)
+			{
+				FbxTexture* texture = FbxCast<FbxTexture>(prop.GetSrcObject<FbxTexture>(i));
+				if (texture)
+				{
+					textureFileNames.push_back(texture->GetName());
+				}
+			}
 		}
 	}
 }
