@@ -19,6 +19,7 @@
 #include "SamplerState.h"
 #include "ModelLoader.h"
 #include "fbxsdk.h"
+#include "UserInterface.h"
 //
 //#include "InputLayout.h"
  
@@ -97,6 +98,7 @@ Buffer                              g_CBBufferChangesEveryFrame;    /*posición y
 Texture                             g_modelTexture;
 SamplerState                        g_sampler;
 ModelLoader                         g_model;
+UserInterface                       g_UserInterface;
 /*---------------------------------------------------------------------------------------*/
 XMMATRIX                            g_World; 
 XMMATRIX                            g_View;
@@ -648,6 +650,7 @@ HRESULT InitDevice()
     modelTextures.push_back(Vela_Char_BaseColor);           //6
     modelTextures.push_back(Vela_Plate_BaseColor);          //7
 
+    
     //Esta info se procesa en un buffer
     //bd.Usage = D3D11_USAGE_DEFAULT;
     //bd.ByteWidth = sizeof( WORD ) * 36;
@@ -744,6 +747,9 @@ HRESULT InitDevice()
     cbChangesOnResize.mProjection = XMMatrixTranspose( g_Projection );
     //g_deviceContext.m_deviceContext->UpdateSubresource( g_pCBChangeOnResize, 0, NULL, &cbChangesOnResize, 0, 0 );
 
+    //initialize Classes
+    g_UserInterface.init(g_window.m_hWnd, g_device.m_device, g_deviceContext.m_deviceContext);
+
     return S_OK;
 }
 
@@ -808,14 +814,20 @@ void CleanupDevice()
     //Libera la información con nuestro método personalizado
     g_device.destroy();
     //if( g_device.m_device ) g_device.m_device->Release();
+    g_UserInterface.destroy();
 }
 
 
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+    return true;
+
     PAINTSTRUCT ps;
     HDC hdc;
 
@@ -840,7 +852,13 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 //Update every frame, recibe actualizaciones lógicas
 void Update(float DeltaTime)
 {
-    // Rotate cube around the origin
+    g_UserInterface.update();
+    bool show_demo_window = true;
+    ImGui::ShowDemoWindow(&show_demo_window);
+    //ImGui::Begin("Test");
+
+    //ImGui::End();
+  // Rotate cube around the origin
     XMVECTOR translation = XMVectorSet(0.0f, -2.0f, 0.0f, 0.0f); // Traslación en x=1, y=2, z=3
     XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(260), XMConvertToRadians(DeltaTime * 50), 0.0f); // Rotación en X=180, Y=180, Z=0
     XMVECTOR scale = XMVectorSet(.03f, .03f, .03f, 0.0f); // Escala por 2 en x, y, z
@@ -861,6 +879,7 @@ void Update(float DeltaTime)
     cb.mWorld = XMMatrixTranspose(g_World);
     cb.vMeshColor = g_vMeshColor;
     g_CBBufferChangesEveryFrame.update(g_deviceContext, 0, nullptr, &cb, 0, 0);
+
 }
 
 //--------------------------------------------------------------------------------------
@@ -952,5 +971,6 @@ void Render()
     // Present our back buffer to our front buffer
     //
     //g_pSwapChain->Present( 0, 0 );
+    g_UserInterface.render();
     g_swapchain.present();
 }

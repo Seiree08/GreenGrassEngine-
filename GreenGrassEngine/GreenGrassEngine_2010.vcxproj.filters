@@ -18,6 +18,18 @@
     <Filter Include="Source">
       <UniqueIdentifier>{f6106ca9-4248-45dd-bf1d-b9a7e9a46248}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Include\ECS">
+      <UniqueIdentifier>{f5e27edb-da5a-4c60-a718-82eb848ae224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui">
+      <UniqueIdentifier>{ba57fa57-0403-49f1-94cf-d567e768f8df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui\Include">
+      <UniqueIdentifier>{08b94680-06bb-4648-a097-8260d77a9090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui\Source">
+      <UniqueIdentifier>{10fd0824-93b1-445b-b9bc-a8251a14d519}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\BaseApp.h">
@@ -71,6 +83,45 @@
     <ClInclude Include="Include\stb_image.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\backends\imgui_impl_win32.h">
+      <Filter>Imgui\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\backends\imgui_impl_dx11.h">
+      <Filter>Imgui\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imconfig.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imgui.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imgui_internal.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imstb_rectpack.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imstb_textedit.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\imgui-docking\imgui-docking\imstb_truetype.h">
+      <Filter>Imgui\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UserInterface.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ECS\Entity.h">
+      <Filter>Include\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ECS\Component.h">
+      <Filter>Include\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ECS\MeshComponent.h">
+      <Filter>Include\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ECS\Actor.h">
+      <Filter>Include\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GreenGrassEngine.cpp" />
@@ -115,6 +166,30 @@
     </ClCompile>
     <ClCompile Include="Source\ModelLoader.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UserInterface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_demo.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_draw.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_tables.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_widgets.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\backends\imgui_impl_dx11.cpp">
+      <Filter>Imgui\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\backends\imgui_impl_win32.cpp">
+      <Filter>Imgui\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
