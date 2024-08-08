@@ -5,7 +5,7 @@ HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
     m_hInst = hInstance;
     //Hace referecia al parámetro de la función "HINSTANCE hInstance"
     // Register class
-    WNDCLASSEX wcex;
+    WNDCLASSEX wcex = {};
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = wndproc; /*Este wndproc es nuestro parámetro*/
@@ -13,13 +13,16 @@ HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
     wcex.cbWndExtra = 0;
     wcex.hInstance = m_hInst;
     wcex.hIcon = LoadIcon(m_hInst, (LPCTSTR)IDI_TUTORIAL1);
-    wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcex.lpszMenuName = NULL;
+    wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = "TutorialWindowClass";
-    wcex.hIconSm = LoadIcon(wcex.hInstance, (LPCTSTR)IDI_TUTORIAL1);
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_TUTORIAL1));
     if (!RegisterClassEx(&wcex))
-        return E_FAIL;
+    {
+      MessageBox(nullptr, "RegisterClassEx failed!", "Error", MB_OK);
+      return E_FAIL;
+    }
 
     // Create window
     RECT rc = { 0, 0, 1000, 800};/*Ajusta el tamaño de la ventana*/
@@ -37,7 +40,10 @@ HRESULT Window::init(HINSTANCE hInstance, int nCmdShow, WNDPROC wndproc)
         hInstance,
         nullptr);
     if (!m_hWnd)
-        return E_FAIL;
+    {
+      MessageBox(nullptr, "CreateWindow failed!", "Error", MB_OK);
+      return E_FAIL;
+    }
 
     ShowWindow(m_hWnd, nCmdShow);
 

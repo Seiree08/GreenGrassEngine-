@@ -7,6 +7,8 @@
 #include <vector>
 #include <windows.h>
 #include <xnamath.h>
+//#include <memory>
+#include <thread>
 
 //Librerías DirectX
 #include <d3d11.h>
@@ -15,6 +17,8 @@
 #include "resource.h"
 
 //Third Parties
+#include "Utilities/Memory/TSharedPointer.h"
+#include "Utilities/Memory/TWeakPointer.h"
 
 /*Se usan macros pa' agilizar el proyecto*/
 

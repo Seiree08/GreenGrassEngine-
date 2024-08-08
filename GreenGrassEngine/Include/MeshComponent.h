@@ -17,5 +17,4 @@ public:
   std::vector<unsigned int> m_index;
   int m_numVertex;
   int m_numIndex;
-
 };

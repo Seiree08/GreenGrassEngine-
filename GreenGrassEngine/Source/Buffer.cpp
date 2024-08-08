@@ -1,6 +1,7 @@
 #include "Buffer.h"
 #include "Device.h"
 #include "DeviceContext.h"
+#include "MeshComponent.h"
 
 // Private method to create buffer
 
@@ -16,15 +17,15 @@ void Buffer::createBuffer(Device& device,
 }
 
 void
-Buffer::init(Device device, Mesh mesh, unsigned int bindFlag) 
+Buffer::init(Device device, MeshComponent mesh, unsigned int bindFlag) 
 {
     if (device.m_device == nullptr) {
         ERROR("Buffer", "init", "CHECK FOR Device device");
     }
 
     // Validate mesh data based on bindFlag que no estèn vacìos pues 
-    if ((bindFlag == D3D11_BIND_VERTEX_BUFFER && mesh.vertex.empty()) ||
-        (bindFlag == D3D11_BIND_INDEX_BUFFER && mesh.index.empty())) {
+    if ((bindFlag == D3D11_BIND_VERTEX_BUFFER && mesh.m_vertex.empty()) ||
+        (bindFlag == D3D11_BIND_INDEX_BUFFER && mesh.m_index.empty())) {
         ERROR("Buffer", "init", "CHECK FOR Mesh mesh");
     }
     //Define info del buffer  
@@ -38,16 +39,16 @@ Buffer::init(Device device, Mesh mesh, unsigned int bindFlag)
     if (bindFlag == D3D11_BIND_VERTEX_BUFFER) 
     {
         m_stride = sizeof(SimpleVertex);                                            /*El espacio de los modelos */
-        desc.ByteWidth = m_stride * static_cast<unsigned int>(mesh.vertex.size());  /*El ancho que recibe el stride, que es del tamaño de la estructura*/
+        desc.ByteWidth = m_stride * static_cast<unsigned int>(mesh.m_vertex.size());  /*El ancho que recibe el stride, que es del tamaño de la estructura*/
         desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        InitData.pSysMem = mesh.vertex.data();
+        InitData.pSysMem = mesh.m_vertex.data();
     }
     else if (bindFlag == D3D11_BIND_INDEX_BUFFER) 
     {
         m_stride = sizeof(unsigned int);
-        desc.ByteWidth = m_stride * static_cast<unsigned int>(mesh.index.size());
+        desc.ByteWidth = m_stride * static_cast<unsigned int>(mesh.m_index.size());
         desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        InitData.pSysMem = mesh.index.data();
+        InitData.pSysMem = mesh.m_index.data();
     }
     //Si todo sale bien se crea el buffer 
     createBuffer(device, desc, &InitData);
