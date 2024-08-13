@@ -13,25 +13,16 @@ Gestión de Materiales: Procesa y aplica materiales extraídos de los modelos FB
 Estructura del Proyecto
 ModelLoader: Clase principal para la carga y procesamiento de modelos FBX. Maneja la importación de modelos, extracción de datos geométricos y materiales, y organiza la información en estructuras adecuadas para su uso en DirectX.
 
-LoadModel: Carga el archivo FBX y procesa su contenido.
-ProcessNode: Procesa cada nodo del modelo, identificando si contiene mallas.
-ProcessMesh: Extrae vértices, índices y UVs de las mallas.
-ProcessMaterials: Procesa los materiales asociados a las mallas, extrayendo nombres de texturas.
-ShaderProgram: Clase encargada de la gestión de shaders. Compila y maneja shaders de vértices y píxeles, y gestiona los layouts de entrada para la renderización.
-
-CompileShaderFromFile: Compila un shader a partir de un archivo.
-CreateShader: Crea y configura los shaders de vértices y píxeles.
-CreateInputLayout: Configura el layout de entrada para los shaders.
-Viewport: Clase que maneja el viewport de renderizado, definiendo el área de la ventana donde se renderizan los modelos.
-
 Requisitos
 Microsoft Visual Studio
 DirectX 11 SDK
 Autodesk FBX SDK
+
 Instalación
 Clona el repositorio del proyecto.
 Configura tu entorno de desarrollo para incluir las rutas de DirectX y el FBX SDK.
 Compila el proyecto en Visual Studio.
+
 Uso
 Ejecuta la aplicación para cargar un modelo FBX.
 Utiliza la interfaz para manipular el modelo cargado.
