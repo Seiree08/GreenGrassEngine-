@@ -1,5 +1,3 @@
-//Todo lo que se encuentra en cpp se utiliza en ejecución, no antes de ella, eso va en .h
-//Es para ahoorar recursos que se puedan precompilar
 #include "SwapChain.h"
 #include "Device.h"
 #include "DeviceContext.h"
@@ -7,7 +5,11 @@
 #include "Texture.h"
 #include "SwapChain.h"
 
-void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& backBuffer, Window window)
+void 
+SwapChain::init(Device& device, 
+                DeviceContext& deviceContext, 
+                Texture& backBuffer, 
+                Window window)
 {
 	//Revisar si la ventana existe
 	if (window.m_hWnd == nullptr)
@@ -21,6 +23,7 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
+    //Tipos de divers de Direct3D a considerar
     D3D_DRIVER_TYPE driverTypes[] =
     {
         D3D_DRIVER_TYPE_HARDWARE,
@@ -29,6 +32,7 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     };
     unsigned int  numDriverTypes = ARRAYSIZE(driverTypes);
 
+    //Niveles de características de Direct3D a considerar
     D3D_FEATURE_LEVEL featureLevels[] =
     {
         D3D_FEATURE_LEVEL_11_0,
@@ -37,24 +41,24 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     };
     unsigned int  numFeatureLevels = ARRAYSIZE(featureLevels);
 
-    //Aquí se revisa el hardware y el nivel de DirectX que se tiene 
-    //Se ajusatn las variables necesarias
+    //Configuraciòn de la cadena de intercambio
     DXGI_SWAP_CHAIN_DESC sd;
-    memset(&sd, 0, sizeof(sd)); /* */
-    sd.BufferCount = 1;
-    sd.BufferDesc.Width = window.m_width; /* */
-    sd.BufferDesc.Height = window.m_height; /* */
-    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    sd.BufferDesc.RefreshRate.Numerator = 60;
-    sd.BufferDesc.RefreshRate.Denominator = 1;
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = window.m_hWnd; /* */
-    sd.SampleDesc.Count = 1;
-    sd.SampleDesc.Quality = 0;
-    sd.Windowed = TRUE;
+    memset(&sd, 0, sizeof(sd)); /*Inicializa la estructura con ceros*/
+    sd.BufferCount = 1; //Nùmero de buffers en la SwapChain
+    sd.BufferDesc.Width = window.m_width; //Ancho del buffer
+    sd.BufferDesc.Height = window.m_height; //Alto del buffer
+    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; //Formato del buffer
+    sd.BufferDesc.RefreshRate.Numerator = 60; //Tasa de refresco del bufferN
+    sd.BufferDesc.RefreshRate.Denominator = 1;  //Tasa de refresco del bufferD
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; //Uso del buffer
+    sd.OutputWindow = window.m_hWnd; //Ventana que mostrarà el contenido
+    sd.SampleDesc.Count = 1; //Nùmero de muestras por pixel
+    sd.SampleDesc.Quality = 0; //Calidad de la texturas
+    sd.Windowed = TRUE; //Modo ventana
 
     HRESULT hr = S_OK;
 
+    //Crea la cadena de intercambio con diferentes tipos de drivers
     for (unsigned int driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
     {
         m_driverType = driverTypes[driverTypeIndex];
@@ -76,9 +80,9 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
             break;
         }
     }
+    //Si la craciòn falla manda mensaje de error
     if (FAILED(hr))
     {
-        //Va a revisar el método de cración de SwapChain
         ERROR("Swapchain", "init", "CHECK FOR D3D11CreateDeviceAndSwapChain()")
             exit(1);
     }
@@ -86,6 +90,7 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     // Create a render target view
     hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer.m_texture);
 
+    // Si falla, muestra un error y sale
     if (FAILED(hr))
     {
         ERROR("Swapchain", "init", "CHECK FOR m_swapChain->GetBuffer()")
@@ -93,21 +98,24 @@ void SwapChain::init(Device& device, DeviceContext& deviceContext, Texture& back
     }
 }
 
-void SwapChain::update()
+void 
+SwapChain::update()
 {
 }
 
-void SwapChain::render()
+void 
+SwapChain::render()
 {
 }
 //Se hace SAFE_RELEASE para la libeeración de memoria
-void SwapChain::destroy()
+void 
+SwapChain::destroy()
 {
 	SAFE_RELEASE(m_swapChain);
 }
 
-void SwapChain::present()
+void 
+SwapChain::present()
 {
 	m_swapChain->Present(0, 0);
-
 }

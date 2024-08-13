@@ -80,29 +80,32 @@ void Buffer::update(DeviceContext& deviceContext,
                     unsigned int SrcDepthPitch)
 {
     deviceContext.UpdateSubresource(m_buffer,
-        DstSubresource,
-        pDstBox,
-        pSrcData,
-        SrcRowPitch,
-        SrcDepthPitch);
+                                    DstSubresource,
+                                    pDstBox,
+                                    pSrcData,
+                                    SrcRowPitch,
+                                    SrcDepthPitch);
 }
 
 //Este render establece la memoria para que se visualice
-void Buffer::render(DeviceContext& deviceContext, unsigned int StartSlot, unsigned int NumBuffers)
+void 
+Buffer::render(DeviceContext& deviceContext, 
+               unsigned int StartSlot, 
+               unsigned int NumBuffers)
 {
     switch (m_bindFlag) /*bindFlag, es el còmo se va a utilizar un buffer, VERTEX_BUFFER o CONSTANT_BUFFER*/
     {
     case D3D11_BIND_VERTEX_BUFFER:
         deviceContext.IASetVertexBuffers(StartSlot,
-            NumBuffers,
-            &m_buffer,  /*Nuestro buffer*/
-            &m_stride,  /*Tamaño del buffer*/
-            &m_offset); /*Còmo se va a desplazar el buffer*/
+                                         NumBuffers,
+                                         &m_buffer,  /*Nuestro buffer*/
+                                         &m_stride,  /*Tamaño del buffer*/
+                                         &m_offset); /*Còmo se va a desplazar el buffer*/
         break;
     case D3D11_BIND_CONSTANT_BUFFER:
         deviceContext.m_deviceContext->VSSetConstantBuffers(StartSlot,
-            NumBuffers,
-            &m_buffer);
+                                                            NumBuffers,
+                                                            &m_buffer);
         break;
     default:
         ERROR("Buffer", "render", "CHECK FOR Unsupported BindFlag");
@@ -110,7 +113,9 @@ void Buffer::render(DeviceContext& deviceContext, unsigned int StartSlot, unsign
     }
 }
 
-void Buffer::render(DeviceContext& deviceContext, DXGI_FORMAT format)
+void 
+Buffer::render(DeviceContext& deviceContext, 
+               DXGI_FORMAT format)
 {
     //Este render registra los valores que van a acomodar los valores en el espacio
     if (m_bindFlag == D3D11_BIND_INDEX_BUFFER) {
@@ -122,15 +127,18 @@ void Buffer::render(DeviceContext& deviceContext, DXGI_FORMAT format)
 }
 
 //WEste es especìfico para modelos 
-void Buffer::renderModel(DeviceContext& deviceContext, unsigned int StartSlot, unsigned int NumBuffers)
+void 
+Buffer::renderModel(DeviceContext& deviceContext, 
+                    unsigned int StartSlot, 
+                    unsigned int NumBuffers)
 {
     deviceContext.m_deviceContext->VSSetConstantBuffers(StartSlot,
-        NumBuffers,
-        &m_buffer);
+                                                        NumBuffers,
+                                                        &m_buffer);
 
     deviceContext.m_deviceContext->PSSetConstantBuffers(StartSlot,
-        NumBuffers,
-        &m_buffer);
+                                                        NumBuffers,
+                                                        &m_buffer);
 }
 
 void Buffer::destroy()

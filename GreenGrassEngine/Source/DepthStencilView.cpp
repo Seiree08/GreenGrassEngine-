@@ -4,7 +4,10 @@
 #include "Texture.h"
 
 
-void DepthStencilView::init(Device& device, Texture& depthStencil, DXGI_FORMAT format)
+void 
+DepthStencilView::init(Device& device, 
+                       Texture& depthStencil, 
+                       DXGI_FORMAT format)
 {
     if (device.m_device == nullptr)
     {
@@ -33,7 +36,8 @@ void DepthStencilView::init(Device& device, Texture& depthStencil, DXGI_FORMAT f
     }
 }
 
-void DepthStencilView::render(DeviceContext& deviceContext)
+void 
+DepthStencilView::render(DeviceContext& deviceContext)
 {
 	deviceContext.m_deviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	//Se usa nuestra variable del parámetro el lugar de las variables del mismo

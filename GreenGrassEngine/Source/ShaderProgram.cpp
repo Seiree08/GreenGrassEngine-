@@ -2,7 +2,8 @@
 #include "Device.h"
 #include "DeviceContext.h"
 
-void ShaderProgram::init(Device device, 
+void 
+ShaderProgram::init(Device device, 
                          std::string fileName, 
                          std::vector<D3D11_INPUT_ELEMENT_DESC> Layout)
 {
@@ -26,11 +27,13 @@ void ShaderProgram::init(Device device,
     CreateShader(device, ShaderType::PIXEL_SHADER);
 }
 
-void ShaderProgram::update()
+void 
+ShaderProgram::update()
 {
 }
 
-void ShaderProgram::render(DeviceContext& deviceContext)
+void 
+ShaderProgram::render(DeviceContext& deviceContext)
 {
     // Establecer el InputLayout
     m_inputLayout.render(deviceContext);
@@ -39,17 +42,19 @@ void ShaderProgram::render(DeviceContext& deviceContext)
     deviceContext.PSSetShader(m_PixelShader, nullptr, 0);
 }
 
-void ShaderProgram::destroy()
+void 
+ShaderProgram::destroy()
 {
     SAFE_RELEASE(m_VertexShader);
     m_inputLayout.destroy();
     SAFE_RELEASE(m_PixelShader);
 }
 
-HRESULT ShaderProgram::CompileShaderFromFile(char* szFileName,
-								             LPCSTR szEntryPoint, 
-								             LPCSTR szShaderModel, 
-								             ID3DBlob** ppBlobOut)
+HRESULT 
+ShaderProgram::CompileShaderFromFile(char* szFileName,
+								                             LPCSTR szEntryPoint, 
+								                             LPCSTR szShaderModel, 
+								                             ID3DBlob** ppBlobOut)
 {
     HRESULT hr = S_OK;
 
@@ -77,14 +82,17 @@ HRESULT ShaderProgram::CompileShaderFromFile(char* szFileName,
     return S_OK;
 }
 
-void ShaderProgram::CreateInputLayout(Device device, 
+void 
+ShaderProgram::CreateInputLayout(Device device, 
                                       std::vector<D3D11_INPUT_ELEMENT_DESC> Layout)
 {
     m_inputLayout.init(device, Layout, m_vertexShaderData);
     m_vertexShaderData->Release();
 }
 
-void ShaderProgram::CreateShader(Device device, ShaderType type)
+void 
+ShaderProgram::CreateShader(Device device, 
+                                 ShaderType type)
 {
     HRESULT hr = S_OK;
     //Este es un recurso pa' saber si hacemos pixelShader o vertexSahder
@@ -135,4 +143,3 @@ void ShaderProgram::CreateShader(Device device, ShaderType type)
         m_vertexShaderData = shaderData;
     }
 }
-    

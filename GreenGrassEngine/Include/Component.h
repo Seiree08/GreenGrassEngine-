@@ -12,7 +12,6 @@ class Component
 {
 public:
   /**
-
 @class Component
 @brief Clase base abstracta para todos los componentes del juego
 */

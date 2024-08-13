@@ -18,7 +18,10 @@ public:
 	/// <param name="device">: Llamamos al device para poder generar los drecursos en memoria </param>
 	/// <param name="textureName">: Llamamos al device para poder generar los drecursos en memoria </param>
 	/// 
-	HRESULT init(Device device, std::string textureName, ExtensionType extensionType);
+	HRESULT 
+		init(Device device, 
+				 std::string textureName, 
+				 ExtensionType extensionType);
 	//Se transorma en HRESULT para ver si un elemento es nulo o no
 
 	/// <summary>
@@ -29,16 +32,18 @@ public:
 	/// <param name="height">: It will take the height of our window</param>
 	/// <param name="Format">: It is a classifier that will allow bit spaces to be created correctly in memory.</param>
 	/// <param name="BindFlags">It s a characteristic to classify the type of texture that is being created.</param>
-	void init(Device device,
-			unsigned int width,
-			unsigned int height,
-			DXGI_FORMAT Format,
-			unsigned int BindFlags);
+	void 
+		init(Device device,
+				 unsigned int width,
+			   unsigned int height,
+				 DXGI_FORMAT Format,
+				 unsigned int BindFlags);
 
 	/// <summary>
 	/// Brief: Is in charge of updating the logic of the texture
 	/// </summary>
-	void update();
+	void 
+		update();
 
 	/// <summary>
 	/// Brief: This is in charge of drawing the resorurce on the scene. (Only if necesary)
@@ -47,12 +52,16 @@ public:
 	/// <param name="StartSlot">: It is in charge of assigning the star point in memory
 	/// We recommend checking that it is not spliced ?? in memory with other resorces.</param>
 	/// <param name="NumViews"></param>
-	void render(DeviceContext& deviceContext, unsigned int StartSlot, unsigned int NumViews);
+	void 
+		render(DeviceContext& deviceContext, 
+					 unsigned int StartSlot, 
+					 unsigned int NumViews);
 
 	/// <summary>
 	/// Brief: This method is in charge of releasing the resources stored in the class's memory
 	/// </summary>
-	void destroy();
+	void 
+		destroy();
 
 	//This varibale is in charge of handle a texture resource as data
 	ID3D11Texture2D* m_texture = nullptr;

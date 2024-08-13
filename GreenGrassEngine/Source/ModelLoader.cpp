@@ -27,7 +27,8 @@ ModelLoader::~ModelLoader()
 	if (lSdkManager) lSdkManager->Destroy();
 }
 
-bool ModelLoader::LoadModel(const std::string& filepath)
+bool ModelLoader::
+LoadModel(const std::string& filepath)
 {
 	//Crea un importador? usando el SDK Manager
 	FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
@@ -67,7 +68,8 @@ bool ModelLoader::LoadModel(const std::string& filepath)
 	return true;
 }
 
-void ModelLoader::ProcessNode(FbxNode* node)
+void ModelLoader::
+ProcessNode(FbxNode* node)
 {
     // Verificar si el nodo tiene un atributo asociado
     if (node->GetNodeAttribute())
@@ -87,7 +89,8 @@ void ModelLoader::ProcessNode(FbxNode* node)
 	}
 }
 
-void ModelLoader::ProcessMesh(FbxNode* node)
+void ModelLoader::
+ProcessMesh(FbxNode* node)
 {
 	FbxMesh* mesh = node->GetMesh();
 	if (!mesh) return;
@@ -169,45 +172,10 @@ void ModelLoader::ProcessMesh(FbxNode* node)
 
 	meshes.push_back(meshData);
 	//ANTERIOR LÓGICA
-	//int polygonCount = mesh->GetPolygonCount();
-	//vertices.reserve(polygonCount * 3);
-	//indices.reserve(polygonCount * 3);
-	////Obtiene el UV set name
-	//const char* uvSetName = nullptr;
-	//FbxStringList uvSetNameList;
-	//mesh->GetUVSetNames(uvSetNameList);
-	//if (uvSetNameList.GetCount() > 0)
-	//{
-	//	uvSetName = uvSetNameList.GetStringAt(0);
-	//}
-	//else
-	//{
-	//	ERROR("ModelLoader", "ProcessMesh", "No UV set found in the mesh")
-	//		return;
-	//}
-	////Obitne los vèrtices e ìndices
-	//for (int i = 0; i < polygonCount; i++)
-	//{
-	//	for (int j = 0; j < 3; j++)
-	//	{
-	//		SimpleVertex vertex;
-	//		//Obtiene las posicones del vertex
-	//		int controlPointIndex = mesh->GetPolygonVertex(i, j);
-	//		FbxVector4 pos = mesh->GetControlPointAt(controlPointIndex);
-	//		vertex.Pos = XMFLOAT3(static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2]));
-	//		//Obtiene las coordenadas de textira
-	//		FbxVector2 texCoord;
-	//		bool unmapped;
-	//		mesh->GetPolygonVertexUV(i, j, uvSetName, texCoord, unmapped);
-	//		vertex.Tex = XMFLOAT2(static_cast<float>(texCoord[0]), static_cast<float>(texCoord[1]));
-	//		//Agrega el vertex a la lista
-	//		vertices.push_back(vertex);
-	//		indices.push_back(vertices.size() - 1);
-	//	}
-	//}
 }
 
-void ModelLoader::ProcessMaterials(FbxSurfaceMaterial* material)
+void ModelLoader::
+ProcessMaterials(FbxSurfaceMaterial* material)
 {
 	// Procesar el material para obtener las texturas asociadas
 	if (material)

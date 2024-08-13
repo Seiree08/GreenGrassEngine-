@@ -1,5 +1,6 @@
+//Se incluyen las dependencias necesarias que son nuestros headers
 #pragma once
-#include "PreRequisites.h" /*Usa las librerías */
+#include "PreRequisites.h"
 #include "Window.h"
 #include "Device.h"
 #include "DeviceContext.h"
@@ -12,35 +13,74 @@
 #include "Buffer.h"
 #include "SamplerState.h"
 #include "ModelLoader.h"
-//#include "fbxsdk.h"
 #include "Actor.h"
 #include "UserInterface.h"
 
 class BaseApp
 {
 public:
-    BaseApp() = default;
-    ~BaseApp() = default;
+  /// <summary>
+  /// Son el contructor y destructor de la clase
+  /// </summary>
+  BaseApp() = default;
+  ~BaseApp() = default;
 
-    HRESULT init();
-    //void init(); Los recursos se inicializan
+    /// <summary>
+    /// Inicializa todos los recursoso de la app
+    /// </summary>
+    /// <returns></returns>
+    HRESULT 
+    init();
 
-    void update();
-    //void update(); Toda la lógica matemática se actualiza
-    //Todo lo que tenga valores va en el update
-    void render();
-    //void render(); Toda la lógica gráfica o visual se actualiza
-    //Todo lo que tenga ClearRedner o de Set va en render
+    /// <summary>
+    /// Actualiza la lógica de la aplicación, cálculos matemáticos
+    /// </summary>
+    void 
+    update();
 
-    void destroy();
-    //void destroy(); Toda la lógica  se libera de memoria, todas las clases que tengan info o punteros se liberan de memoria
-
-    int run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, WNDPROC wndproc);
+    /// <summary>
+    /// Se ejcutan llamadas para dibujar objetos en pantalla
+    /// </summary>
+    void 
+    render();
     
-    //Se define la función de WndProc
-    //LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam  );
+    /// <summary>
+    /// Libera los recursos usados por la aplicación
+    /// </summary>
+    void 
+    destroy();
 
-    void CreateGrid(int width, int depth, float spacing);
+    /// <summary>
+    /// Maneja el ciclo principal de la aplicación, actualizando y renderizando 
+    /// mientras procesa mensajes de Windows.
+    /// </summary>
+    /// <param name="hInstance">: Se usa principalmente para cargar recursos cómo íconos, 
+    /// menús, crear ventanas</param>
+    /// <param name="hPrevInstance">: Verifica si hay otra instancia de la app
+    ///   ejecutándose</param>
+    /// <param name="lpCmdLine">: Es un puntero a una cadena de caracteres 
+    ///   (se pasa como una sòla cadena de texto)</param>
+    /// <param name="nCmdShow">: Indica còmo se va a mostrar la pantalla al 
+    /// iniciar la app</param>
+    /// <param name="wndproc"></param>
+    /// <returns></returns>
+    int 
+    run(HINSTANCE hInstance, 
+        HINSTANCE hPrevInstance, 
+        LPWSTR lpCmdLine, 
+        int nCmdShow, 
+        WNDPROC wndproc);
+    
+    /// <summary>
+    /// Crea la cuadrícula que se muestra es escena
+    /// </summary>
+    /// <param name="width">: Es para el ancho</param>
+    /// <param name="depth">: Es para la profundidad</param>
+    /// <param name="spacing">: Es para el espaciado de la malla</param>
+    void 
+      CreateGrid(int width, 
+                 int depth, 
+                 float spacing);
 
 private:
 
@@ -55,13 +95,10 @@ private:
     RenderTargetView                    m_renderTargetView;
     Viewport                            m_viewport;
     ShaderProgram                       m_shaderProgram;
-    //Buffer                            m g_vertexBuffer;
     std::vector<Buffer>                 m_vertexBuffers;
-    //Buffer                            m g_indexBuffer;
     std::vector<Buffer>                 m_indexBuffers;
     Buffer                              m_CBBufferNeverChanges;         /*vista de cámara*/
     Buffer                              m_CBBufferChangeOnResize;       /*proyección de cámara*/
-    //Buffer                            m g_CBBufferChangesEveryFrame;    /*posición y colores del modelo*/
     Texture                             m_modelTexture;
     SamplerState                        m_sampler;
     ModelLoader                         m_model;
@@ -70,10 +107,6 @@ private:
     XMMATRIX                            m_View;
     XMMATRIX                            m_Projection;
     XMFLOAT4                            m_vMeshColor;
-
-    //std::vector<SimpleVertex> gridVertices;
-    //std::vector<unsigned int> gridIndices;
-    //Mesh                                g_mesh;
 
     //Grid Actor
     MeshComponent MC;

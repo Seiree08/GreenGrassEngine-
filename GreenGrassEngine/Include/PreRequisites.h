@@ -7,7 +7,6 @@
 #include <vector>
 #include <windows.h>
 #include <xnamath.h>
-//#include <memory>
 #include <thread>
 
 //Librerías DirectX
@@ -24,15 +23,6 @@
 
 // MACRO for safe release of resources, libera memoria de forma segura
 #define SAFE_RELEASE(x) if(x != nullptr) x->Release(); x = nullptr;
-
-// * To check monster
-//#define OutputLOG(_ClassName, _FunctionName, _OutputMessage)           \
-//OutputDebugStringA(_ClassName);                                        \
-//OutputDebugStringA(" : In Function : ");                               \
-//OutputDebugStringA(_FunctionName);                                     \
-//OutputDebugStringA(" : ");                                             \
-//OutputDebugStringA(_OutputMessage);                                    \
-//OutputDebugStringA("\n");
 
 //Muestra los mensaje en consola pa' saber qué pasa en el proyecto
 #define WARNING( s )                         \

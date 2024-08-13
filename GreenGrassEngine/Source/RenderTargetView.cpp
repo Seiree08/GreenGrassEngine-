@@ -5,9 +5,10 @@
 #include "DepthStencilView.h"
 
 // Comprueba que los recuersos estén inicializados
-void RenderTargetView::init(Device device, 
-							Texture backBuffer, 
-							DXGI_FORMAT Format)
+void RenderTargetView::
+init(Device device, 
+		 Texture backBuffer, 
+		 DXGI_FORMAT Format)
 {
 	if (device.m_device == nullptr) {
 		ERROR("RenderTargetView", "init", "CHECK FOR Device device")
@@ -38,20 +39,23 @@ void RenderTargetView::init(Device device,
 	}
 }
 
-void RenderTargetView::update()
+void RenderTargetView::
+update()
 {
 }
 
-void RenderTargetView::render(DeviceContext& deviceContext, 
-							  DepthStencilView& depthStencilView, 
-							  unsigned int numViews, 
-							  float ClearColor[4])
+void RenderTargetView::
+render(DeviceContext& deviceContext, 
+			 DepthStencilView& depthStencilView, 
+			 unsigned int numViews, 
+			 float ClearColor[4])
 {
 	deviceContext.m_deviceContext->ClearRenderTargetView(m_renderTargetView, ClearColor);
 	deviceContext.m_deviceContext->OMSetRenderTargets(numViews, &m_renderTargetView, depthStencilView.m_pDepthStencilView);
 }
 
-void RenderTargetView::destroy()
+void RenderTargetView::
+destroy()
 {
 	SAFE_RELEASE(m_renderTargetView);
 }
